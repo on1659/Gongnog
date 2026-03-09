@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>근무기록</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  /* 액센트 (기본: 네이비블루) */
+  --acc:#1a56db;--acc-soft:#eff6ff;--acc-text:#1e40af;--today-bg:#1e293b;
+  /* 배경 (기본: 라이트) */
+  --bg:#ffffff;--surface:#f2f2f7;--surface2:#e9e9ef;--border:#e5e7eb;
+  --t1:#111827;--t2:#6b7280;--t3:#b0b7c3;
+  /* 고정 */
+  --ot-c:#f97316;--meal-c:#16a34a;--sun-c:#ef4444;--sat-c:#3b82f6;--neg-c:#ef4444;--pos-c:#16a34a;
+}
+/* ── 액센트 컬러 ── */
+.acc-blue  {--acc:#1a56db;--acc-soft:#eff6ff;--acc-text:#1e40af;--today-bg:#1e293b;}
+.acc-green {--acc:#16a34a;--acc-soft:#f0fdf4;--acc-text:#14532d;--today-bg:#14532d;}
+.acc-purple{--acc:#7c3aed;--acc-soft:#faf5ff;--acc-text:#4c1d95;--today-bg:#3b0764;}
+.acc-rose  {--acc:#e11d48;--acc-soft:#fff1f2;--acc-text:#881337;--today-bg:#881337;}
+.acc-orange{--acc:#ea580c;--acc-soft:#fff7ed;--acc-text:#9a3412;--today-bg:#7c2d12;}
+.acc-teal  {--acc:#0d9488;--acc-soft:#f0fdfa;--acc-text:#134e4a;--today-bg:#134e4a;}
+/* ── 배경 테마 ── */
+.bg-light{--bg:#ffffff;--surface:#f2f2f7;--surface2:#e9e9ef;--border:#e5e7eb;--t1:#111827;--t2:#6b7280;--t3:#b0b7c3;}
+.bg-warm {--bg:#fdf8f3;--surface:#f2ece3;--surface2:#e8ddd0;--border:#e0d4c3;--t1:#2c1810;--t2:#7a5c48;--t3:#b89a88;}
+.bg-dark {--bg:#111827;--surface:#1f2937;--surface2:#374151;--border:#374151;--t1:#f9fafb;--t2:#9ca3af;--t3:#6b7280;}
+.bg-amoled{--bg:#000000;--surface:#111111;--surface2:#1f1f1f;--border:#2a2a2a;--t1:#ffffff;--t2:#a0a0a0;--t3:#555555;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--surface);display:flex;justify-content:center;min-height:100vh;}
+#app{width:100%;max-width:390px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;box-shadow:0 0 60px rgba(0,0,0,.12);}
+/* LOGIN */
+#loginScreen{display:flex;flex-direction:column;justify-content:flex-end;min-height:100vh;padding:0 28px 52px;}
+.login-hero{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:12px;}
+.login-logo{font-size:38px;font-weight:800;color:var(--acc);letter-spacing:-2px;line-height:1;}
+.login-logo-sub{font-size:38px;font-weight:300;color:var(--t2);letter-spacing:-2px;line-height:1.1;}
+.login-desc{font-size:13px;color:var(--t3);margin-top:10px;line-height:1.6;}
+.login-divider{height:1px;background:var(--border);margin:32px 0;}
+.lf-label{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;display:block;}
+.lf-input{width:100%;padding:0 0 12px;border:none;border-bottom:1.5px solid var(--border);font-size:16px;font-family:inherit;color:var(--t1);background:transparent;outline:none;margin-bottom:22px;}
+.lf-input:focus{border-bottom-color:var(--acc);}
+.login-btn{width:100%;padding:16px;border-radius:16px;border:none;background:var(--acc);color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;}
+.login-sub{text-align:center;margin-top:14px;font-size:13px;color:var(--t3);}
+.login-sub a{color:var(--acc);font-weight:600;cursor:pointer;}
+/* MAIN */
+#mainApp{display:none;flex-direction:column;flex:1;}
+/* TOPBAR */
+.topbar{display:flex;align-items:flex-end;justify-content:space-between;padding:20px 20px 0;}
+.month-year{font-size:13px;font-weight:500;color:var(--t3);letter-spacing:.3px;}
+.month-big{font-size:58px;font-weight:300;color:var(--t1);letter-spacing:-4px;line-height:1.05;margin-top:-2px;}
+.topbar-icons{display:flex;gap:6px;padding-bottom:8px;}
+.ico-btn{width:36px;height:36px;border-radius:10px;border:none;background:var(--surface);color:var(--t2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+/* SUMMARY */
+.summary-row{display:flex;gap:8px;padding:12px 16px 0;}
+.spill{flex:1;background:var(--surface);border-radius:12px;padding:10px 12px;border-left:3px solid var(--c,var(--acc));}
+.spill-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.3px;}
+.spill-val{font-size:13px;font-weight:700;color:var(--t1);margin-top:3px;}
+/* WEEK HDR */
+.week-hdr{display:grid;grid-template-columns:repeat(7,1fr);padding:16px 10px 6px;}
+.wlbl{text-align:center;font-size:11px;font-weight:700;color:var(--t3);}
+/* CAL */
+.cal-wrap{padding:0 6px;}
+.cal-row{display:grid;grid-template-columns:repeat(7,1fr);}
+.dcell{min-height:62px;padding:3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;border-radius:10px;transition:.1s;position:relative;}
+.dnum-ring{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:2px;}
+.dnum{font-size:14px;font-weight:500;color:var(--t1);}
+.dcell.is-today .dnum-ring{background:var(--today-bg);}
+.dcell.is-today .dnum{color:#fff!important;}
+.dcell.is-sel:not(.is-today) .dnum-ring{background:var(--acc-soft);border:1.5px solid var(--acc);}
+.dcell.is-sel:not(.is-today) .dnum{color:var(--acc-text)!important;}
+.ev-list{width:100%;display:flex;flex-direction:column;gap:1.5px;}
+.ev{width:100%;border-radius:3px;padding:1.5px 4px;font-size:8.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* DETAIL */
+.detail-wrap{flex:1;border-top:1px solid var(--border);overflow-y:auto;min-height:0;}
+.detail-hdr{padding:16px 20px 8px;display:flex;align-items:center;justify-content:space-between;}
+.detail-date{font-size:18px;font-weight:700;color:var(--t1);letter-spacing:-.4px;}
+.detail-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--surface);}
+.detail-list{padding:0 14px 110px;}
+.dcard{background:var(--surface);border-radius:16px;padding:16px;display:flex;gap:14px;margin-bottom:8px;animation:fadeUp .22s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dcard-bar{width:3.5px;border-radius:2px;flex-shrink:0;background:var(--acc);}
+.dcard-body{flex:1;}
+.dcard-title{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:6px;}
+.dcard-time{font-size:13px;color:var(--t2);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.dcard-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.chip-ot{background:#fff7ed;color:var(--ot-c);}
+.chip-meal{background:#f0fdf4;color:var(--meal-c);}
+.chip-we{background:var(--acc-soft);color:var(--acc-text);}
+/* 급량수지카드 */
+.mfcard{background:var(--surface);border-radius:16px;padding:16px;margin-bottom:8px;animation:fadeUp .22s ease .05s both;}
+.mfc-title{font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px;}
+.mfc-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.mfc-row:last-child{border-bottom:none;}
+.mfc-label{font-size:13px;color:var(--t2);}
+.mfc-val{font-size:13px;font-weight:700;}
+.pos{color:var(--pos-c);}
+.neg{color:var(--neg-c);}
+.mfc-net{font-size:16px;}
+.detail-empty{padding:40px 20px;text-align:center;color:var(--t3);font-size:14px;line-height:2;}
+/* BTM BAR */
+.btm-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:390px;background:var(--bg);border-top:1px solid var(--border);padding:10px 20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:10;}
+.add-btn{display:flex;align-items:center;gap:7px;background:none;border:none;font-size:15px;font-weight:700;color:var(--acc);cursor:pointer;font-family:inherit;}
+.nav-pills{display:flex;background:var(--surface);border-radius:10px;overflow:hidden;}
+.npill{padding:7px 14px;border:none;background:none;font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;font-family:inherit;}
+.npill.on{background:var(--acc);color:#fff;}
+/* STATS */
+#viewStats{display:none;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:40px;}
+.stats-topbar{padding:20px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
+.stats-title{font-size:24px;font-weight:700;color:var(--t1);letter-spacing:-.5px;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px;}
+.sbox{background:var(--surface);border-radius:16px;padding:14px 16px;}
+.sbox-lbl{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:4px;}
+.sbox-val{font-size:22px;font-weight:700;color:var(--t1);letter-spacing:-.5px;}
+.sbox-val.ot{color:var(--ot-c);}
+.sbox-val.ml{color:var(--meal-c);}
+.sbox-val.ac{color:var(--acc);}
+.stat-sect{margin:10px 14px 0;background:var(--surface);border-radius:16px;overflow:hidden;}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.srl{font-size:14px;color:var(--t2);}
+.srv{font-size:14px;font-weight:700;color:var(--t1);}
+.chart-card{margin:10px 14px 0;background:var(--surface);border-radius:16px;padding:16px;}
+.chart-lbl{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:12px;}
+.exp-row{display:flex;gap:8px;margin:10px 14px 0;}
+.exp-btn{flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-weight:700;color:var(--acc);cursor:pointer;font-family:inherit;}
+/* SETTINGS */
+#viewSettings{display:none;flex-direction:column;flex:1;overflow-y:auto;padding-bottom:40px;}
+.set-topbar{padding:20px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
+.set-title{font-size:24px;font-weight:700;color:var(--t1);letter-spacing:-.5px;}
+.set-section{margin:10px 14px 0;background:var(--surface);border-radius:16px;overflow:hidden;}
+.set-sec-lbl{padding:10px 16px 4px;font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;}
+.spr{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);}
+.spr:last-child{border-bottom:none;}
+.spr-lbl{font-size:15px;color:var(--t1);}
+.spr-r{display:flex;align-items:center;gap:6px;}
+.spr-in{width:76px;padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:14px;text-align:right;font-family:inherit;outline:none;background:var(--bg);color:var(--t1);}
+.spr-unit{font-size:13px;color:var(--t3);}
+.tr-wrap{display:flex;align-items:center;gap:5px;}
+.tr-in{width:76px;padding:7px 8px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;font-family:inherit;outline:none;background:var(--bg);color:var(--t1);}
+.tr-sep{font-size:12px;color:var(--t3);}
+.theme-swatches{padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;}
+.sw-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;}
+.sw-circle{width:36px;height:36px;border-radius:50%;border:3px solid transparent;}
+.sw-circle.on{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--acc);}
+.sw-name{font-size:10px;color:var(--t3);font-weight:500;}
+.note-box{margin:10px 14px 0;background:var(--acc-soft);border-radius:16px;padding:14px 16px;font-size:12px;color:var(--acc-text);line-height:1.9;}
+.save-btn{margin:12px 14px;padding:15px;border-radius:14px;border:none;background:var(--acc);color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer;width:calc(100% - 28px);}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal-sheet{background:var(--bg);border-radius:26px 26px 0 0;padding:18px 20px 38px;width:100%;max-width:390px;transform:translateY(100%);transition:transform .32s cubic-bezier(.25,.46,.45,.94);max-height:90vh;overflow-y:auto;}
+.modal-overlay.open .modal-sheet{transform:none;}
+.mhandle{width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
+.modal-date{font-size:19px;font-weight:700;color:var(--t1);letter-spacing:-.4px;}
+.modal-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin:6px 0 16px;background:var(--surface);color:var(--t2);}
+.msec-lbl{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase;margin:14px 0 8px;}
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;}
+.tf label{font-size:11px;color:var(--t3);font-weight:600;display:block;margin-bottom:5px;}
+.tf input[type=time]{width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:17px;font-weight:600;font-family:inherit;color:var(--t1);outline:none;}
+.calc-chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:10px 0;}
+.cchip{background:var(--surface);border-radius:12px;padding:10px 10px 8px;}
+.cchip-lbl{font-size:10px;color:var(--t3);font-weight:600;margin-bottom:3px;}
+.cchip-val{font-size:14px;font-weight:700;}
+.modal-hint{font-size:11px;color:var(--t3);margin:6px 0 14px;line-height:1.5;}
+.meal-exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.mef label{font-size:11px;color:var(--t3);font-weight:600;display:block;margin-bottom:5px;}
+.mef input{width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:15px;font-weight:600;font-family:inherit;color:var(--t1);outline:none;text-align:right;}
+.mef-unit{font-size:11px;color:var(--t3);text-align:right;margin-top:3px;}
+.mbpreview{background:var(--surface);border-radius:12px;padding:12px 14px;margin:10px 0;}
+.mbp-row{display:flex;justify-content:space-between;padding:3px 0;}
+.mbp-lbl{font-size:12px;color:var(--t2);}
+.mbp-val{font-size:12px;font-weight:700;}
+.mbp-div{height:1px;background:var(--border);margin:6px 0;}
+.mbp-net{display:flex;justify-content:space-between;padding:3px 0;}
+.mbp-net-lbl{font-size:13px;font-weight:700;color:var(--t1);}
+.mbp-net-val{font-size:14px;font-weight:800;}
+.memo-field{margin-top:4px;}
+.memo-field label{font-size:11px;color:var(--t3);font-weight:600;display:block;margin-bottom:5px;}
+.memo-field input{width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:14px;font-family:inherit;color:var(--t1);outline:none;margin-bottom:18px;}
+.modal-btns{display:flex;gap:8px;}
+.mbtn-del{padding:14px 14px;border-radius:14px;border:none;background:var(--surface);color:var(--sun-c);font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.mbtn-cancel{flex:1;padding:14px;border-radius:14px;border:none;background:var(--surface);font-size:14px;font-family:inherit;cursor:pointer;color:var(--t2);}
+.mbtn-save{flex:2;padding:14px;border-radius:14px;border:none;background:var(--acc);color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+</style>
+</head>
+<body>
+<div id="app" class="acc-blue bg-light">
+
+<div id="loginScreen">
+  <div class="login-hero">
+    <div class="login-logo">근무</div>
+    <div class="login-logo-sub">기록</div>
+    <div class="login-desc">출퇴근 · 초과근무 · 급량비 수지<br>한눈에 관리하세요</div>
+  </div>
+  <div class="login-divider"></div>
+  <label class="lf-label">아이디</label>
+  <input class="lf-input" type="text" value="kim_gongmu">
+  <label class="lf-label">비밀번호</label>
+  <input class="lf-input" type="password" value="password">
+  <button class="login-btn" onclick="enterApp()">로그인</button>
+  <div class="login-sub">처음이신가요? <a>회원가입</a></div>
+</div>
+
+<div id="mainApp">
+  <div id="viewCal" style="display:flex;flex-direction:column;height:100vh;overflow:hidden;">
+    <div style="padding:16px 20px 0;">
+      <!-- 1줄: 우측상단 닉네임 + 로그아웃 -->
+      <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;margin-bottom:6px;">
+        <div style="display:flex;align-items:center;gap:4px;background:var(--surface);border-radius:7px;padding:3px 8px 3px 4px;">
+          <div id="userAvatar" style="width:16px;height:16px;border-radius:4px;background:var(--acc);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;">김</div>
+          <span id="userNickname" style="font-size:11px;font-weight:600;color:var(--t2);">kim_gongmu</span>
+        </div>
+        <button onclick="goLogin()" style="width:26px;height:26px;border-radius:7px;border:none;background:var(--surface);font-size:12px;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;">↩</button>
+      </div>
+      <!-- 2줄: 월 + 네비 -->
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+        <div>
+          <div class="month-year" id="monthYear">2026년</div>
+          <div class="month-big" id="monthBig">3</div>
+        </div>
+        <div class="topbar-icons" style="padding-bottom:8px;">
+          <button class="ico-btn" onclick="changeMonth(-1)">‹</button>
+          <button class="ico-btn" onclick="changeMonth(1)">›</button>
+          <button class="ico-btn" onclick="showView('stats')">📊</button>
+          <button class="ico-btn" onclick="showView('settings')">⚙️</button>
+        </div>
+      </div>
+    </div>
+    <div class="summary-row">
+      <div class="spill" style="--c:var(--acc)"><div class="spill-lbl">총 근무</div><div class="spill-val" id="sumWork">—</div></div>
+      <div class="spill" style="--c:var(--ot-c)"><div class="spill-lbl">초과</div><div class="spill-val" id="sumOt" style="color:var(--ot-c)">—</div></div>
+      <div class="spill" style="--c:var(--meal-c)"><div class="spill-lbl">급량 수지</div><div class="spill-val" id="sumMealNet">—</div></div>
+    </div>
+    <div class="week-hdr">
+      <div class="wlbl">월</div><div class="wlbl">화</div><div class="wlbl">수</div>
+      <div class="wlbl">목</div><div class="wlbl">금</div>
+      <div class="wlbl" style="color:var(--sat-c)">토</div>
+      <div class="wlbl" style="color:var(--sun-c)">일</div>
+    </div>
+    <div class="cal-wrap" id="calGrid"></div>
+    <div class="detail-wrap">
+      <div class="detail-hdr">
+        <div class="detail-date" id="detailDateLbl">날짜를 선택하세요</div>
+        <div class="detail-tag" id="detailTag" style="display:none"></div>
+      </div>
+      <div class="detail-list" id="detailList">
+        <div class="detail-empty">날짜를 선택하세요</div>
+      </div>
+    </div>
+    <div class="btm-bar">
+      <button class="add-btn" onclick="openModal(selectedDate)">＋ 기록 입력</button>
+      <div class="nav-pills">
+        <button class="npill on" onclick="showView('cal')">캘린더</button>
+        <button class="npill" onclick="showView('stats')">통계</button>
+        <button class="npill" onclick="showView('settings')">설정</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="viewStats">
+    <div class="stats-topbar">
+      <div class="stats-title" id="statsTitle">3월 통계</div>
+      <div class="topbar-icons"><button class="ico-btn" onclick="showView('cal')">✕</button></div>
+    </div>
+    <div class="stats-grid">
+      <div class="sbox"><div class="sbox-lbl">총 근무시간</div><div class="sbox-val ac" id="stWork">—</div></div>
+      <div class="sbox"><div class="sbox-lbl">초과근무</div><div class="sbox-val ot" id="stOt">—</div></div>
+      <div class="sbox"><div class="sbox-lbl">급량비 수령액</div><div class="sbox-val ml" id="stMealIn">—</div></div>
+      <div class="sbox"><div class="sbox-lbl">급량 수지</div><div class="sbox-val" id="stMealNet">—</div></div>
+    </div>
+    <div class="stat-sect">
+      <div class="srow"><div class="srl">총 근무일</div><div class="srv" id="st2Days">—</div></div>
+      <div class="srow"><div class="srl">급량비 수령액 합계</div><div class="srv" style="color:var(--meal-c)" id="st2In">—</div></div>
+      <div class="srow"><div class="srl">실제 식비 지출 합계</div><div class="srv" style="color:var(--ot-c)" id="st2Out">—</div></div>
+      <div class="srow"><div class="srl">순수 수지</div><div class="srv" style="font-size:18px;font-weight:800;" id="st2Net">—</div></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-lbl">일별 근무시간</div>
+      <canvas id="workChart" height="130"></canvas>
+    </div>
+    <div class="exp-row">
+      <button class="exp-btn">📊 엑셀 다운로드</button>
+      <button class="exp-btn">📄 CSV 다운로드</button>
+    </div>
+  </div>
+
+  <div id="viewSettings">
+    <div class="set-topbar">
+      <div class="set-title">설정</div>
+      <div class="topbar-icons"><button class="ico-btn" onclick="showView('cal')">✕</button></div>
+    </div>
+    <div class="set-section">
+      <div class="set-sec-lbl">액센트 컬러</div>
+      <div class="theme-swatches">
+        <div class="sw-item" onclick="setAcc('blue')"><div class="sw-circle on" id="acc-blue" style="background:#1a56db"></div><div class="sw-name">블루</div></div>
+        <div class="sw-item" onclick="setAcc('green')"><div class="sw-circle" id="acc-green" style="background:#16a34a"></div><div class="sw-name">그린</div></div>
+        <div class="sw-item" onclick="setAcc('purple')"><div class="sw-circle" id="acc-purple" style="background:#7c3aed"></div><div class="sw-name">퍼플</div></div>
+        <div class="sw-item" onclick="setAcc('rose')"><div class="sw-circle" id="acc-rose" style="background:#e11d48"></div><div class="sw-name">로즈</div></div>
+        <div class="sw-item" onclick="setAcc('orange')"><div class="sw-circle" id="acc-orange" style="background:#ea580c"></div><div class="sw-name">오렌지</div></div>
+        <div class="sw-item" onclick="setAcc('teal')"><div class="sw-circle" id="acc-teal" style="background:#0d9488"></div><div class="sw-name">틸</div></div>
+      </div>
+    </div>
+    <div class="set-section" style="margin-top:10px;">
+      <div class="set-sec-lbl">배경 테마</div>
+      <div class="theme-swatches">
+        <div class="sw-item" onclick="setBg('light')">
+          <div class="sw-circle on" id="bg-light" style="background:#ffffff;border:2px solid #e5e7eb;box-sizing:border-box;"></div>
+          <div class="sw-name">라이트</div>
+        </div>
+        <div class="sw-item" onclick="setBg('warm')">
+          <div class="sw-circle" id="bg-warm" style="background:#fdf8f3;border:2px solid #e0d4c3;box-sizing:border-box;"></div>
+          <div class="sw-name">웜</div>
+        </div>
+        <div class="sw-item" onclick="setBg('dark')">
+          <div class="sw-circle" id="bg-dark" style="background:#111827"></div>
+          <div class="sw-name">다크</div>
+        </div>
+        <div class="sw-item" onclick="setBg('amoled')">
+          <div class="sw-circle" id="bg-amoled" style="background:#000000"></div>
+          <div class="sw-name">AMOLED</div>
+        </div>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-sec-lbl">초과근무 규칙</div>
+      <div class="spr"><span class="spr-lbl">평일 자동공제</span><div class="spr-r"><input class="spr-in" type="number" value="60"><span class="spr-unit">분</span></div></div>
+      <div class="spr"><span class="spr-lbl">최대 초과근무</span><div class="spr-r"><input class="spr-in" type="number" value="240"><span class="spr-unit">분</span></div></div>
+    </div>
+    <div class="set-section">
+      <div class="set-sec-lbl">급량비 단가</div>
+      <div class="spr"><span class="spr-lbl">평일 급량비</span><div class="spr-r"><input class="spr-in" type="number" value="9000"><span class="spr-unit">원/회</span></div></div>
+      <div class="spr"><span class="spr-lbl">주말 급량비</span><div class="spr-r"><input class="spr-in" type="number" value="9000"><span class="spr-unit">원/회</span></div></div>
+    </div>
+    <div class="set-section">
+      <div class="set-sec-lbl">평일 급량비 시간</div>
+      <div class="spr"><span class="spr-lbl">오전 구간</span><div class="tr-wrap"><input class="tr-in" type="time" value="07:00"><span class="tr-sep">~</span><input class="tr-in" type="time" value="09:00"></div></div>
+      <div class="spr"><span class="spr-lbl">오후 구간</span><div class="tr-wrap"><input class="tr-in" type="time" value="18:00"><span class="tr-sep">~</span><input class="tr-in" type="time" value="21:00"></div></div>
+      <div class="spr"><span class="spr-lbl">최소 근무</span><div class="spr-r"><input class="spr-in" type="number" value="60"><span class="spr-unit">분</span></div></div>
+    </div>
+    <div class="note-box">
+      📌 <b>초과근무</b>: (근무 - 9h) - 자동공제, 최대 4시간<br>
+      📌 <b>급량비</b>: 각 구간 60분 이상 근무 시 +1회<br>
+      📌 <b>수지</b>: 급량비 수령액 - 실제 식비 지출
+    </div>
+    <button class="save-btn">저장</button>
+  </div>
+</div>
+</div>
+
+
+<!-- DAY SHEET (날짜 클릭 → 간략 정보) -->
+<div class="modal-overlay" id="daySheetOv" onclick="closeDaySheet(event)">
+  <div class="modal-sheet" style="padding-bottom:28px;">
+    <div class="mhandle"></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+      <div>
+        <div class="modal-date" id="dsDate">3월 5일 목요일</div>
+        <div class="modal-badge" id="dsBadge">평일</div>
+      </div>
+      <button onclick="closeDaySheet();openModal(selectedDate);" style="padding:8px 14px;border-radius:12px;border:none;background:var(--acc);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">✏️ 편집</button>
+    </div>
+    <!-- 기록 없을 때 -->
+    <div id="dsEmpty" style="display:none;padding:24px 0;text-align:center;color:var(--t3);font-size:14px;line-height:2;">
+      기록이 없습니다<br>
+      <button onclick="closeDaySheet();openModal(selectedDate);" style="margin-top:8px;padding:10px 20px;border-radius:12px;border:none;background:var(--acc);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">＋ 기록 입력</button>
+    </div>
+    <!-- 기록 있을 때 -->
+    <div id="dsContent" style="display:none;">
+      <!-- 출퇴근 요약 -->
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <div style="width:4px;height:32px;border-radius:2px;background:var(--acc);flex-shrink:0;"></div>
+          <div>
+            <div style="font-size:15px;font-weight:600;color:var(--t1);" id="dsWorkTitle">근무기록</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:2px;" id="dsWorkTime">08:00 → 18:00</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="dsChips"></div>
+      </div>
+      <!-- 급량 수지 -->
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;margin-bottom:10px;">🍽 급량비 수지</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+          <span style="font-size:13px;color:var(--t2);" id="dsIncomeLabel">수령액</span>
+          <span style="font-size:13px;font-weight:700;color:var(--pos-c);" id="dsIncome">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;color:var(--t2);">식비 지출</span>
+          <span style="font-size:13px;font-weight:700;color:var(--neg-c);" id="dsExpense">—</span>
+        </div>
+        <div style="height:1px;background:var(--border);margin-bottom:8px;"></div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="font-size:14px;font-weight:700;color:var(--t1);">순수 수지</span>
+          <span style="font-size:16px;font-weight:800;" id="dsNet">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOv" onclick="closeModal(event)">
+  <div class="modal-sheet">
+    <div class="mhandle"></div>
+    <div class="modal-date" id="mDate">3월 5일 목요일</div>
+    <div class="modal-badge" id="mBadge">평일</div>
+    <div class="msec-lbl">⏰ 출퇴근 시간</div>
+    <div class="time-grid">
+      <div class="tf"><label>출근</label><input type="time" id="inTime" value="08:00" oninput="liveCalc()"></div>
+      <div class="tf"><label>퇴근</label><input type="time" id="outTime" value="18:00" oninput="liveCalc()"></div>
+    </div>
+    <div class="calc-chips">
+      <div class="cchip"><div class="cchip-lbl">근무시간</div><div class="cchip-val" id="lcWork" style="color:var(--acc)">—</div></div>
+      <div class="cchip"><div class="cchip-lbl">초과근무</div><div class="cchip-val" id="lcOt" style="color:var(--ot-c)">—</div></div>
+      <div class="cchip"><div class="cchip-lbl">급량 횟수</div><div class="cchip-val" id="lcMeals" style="color:var(--meal-c)">—</div></div>
+    </div>
+    <div class="modal-hint" id="mHint">📌 평일 자동공제 60분 · 최대 초과근무 4시간</div>
+    <div class="msec-lbl">🍽 실제 식비 지출</div>
+    <div class="tf" style="margin-bottom:4px">
+      <label>오늘 총 식비 지출</label>
+      <input type="number" id="expTotal" value="0" oninput="liveCalc()" style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:17px;font-weight:600;font-family:inherit;color:var(--t1);outline:none;text-align:right;">
+    </div>
+    <div style="text-align:right;font-size:11px;color:var(--t3);margin-bottom:4px">원</div>
+    <div class="mbpreview">
+      <div class="mbp-row"><span class="mbp-lbl">급량비 수령액</span><span class="mbp-val pos" id="mbpIn">—</span></div>
+      <div class="mbp-row"><span class="mbp-lbl">식비 지출</span><span class="mbp-val neg" id="mbpOut">—</span></div>
+      <div class="mbp-div"></div>
+      <div class="mbp-net"><span class="mbp-net-lbl">순수 수지</span><span class="mbp-net-val" id="mbpNet">—</span></div>
+    </div>
+    <div class="memo-field"><label>메모</label><input type="text" placeholder="메모 (선택사항)"></div>
+    <div class="modal-btns">
+      <button class="mbtn-del" id="mDelBtn">삭제</button>
+      <button class="mbtn-cancel" onclick="closeModal()">취소</button>
+      <button class="mbtn-save" onclick="closeModal()">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const HOL={"2026-01-01":"신정","2026-01-29":"설날","2026-03-01":"삼일절","2026-05-05":"어린이날","2026-05-24":"부처님오신날","2026-06-06":"현충일","2026-08-15":"광복절","2026-09-25":"추석","2026-10-03":"개천절","2026-10-09":"한글날","2026-12-25":"크리스마스"};
+const WKKO=["일","월","화","수","목","금","토"];
+const MEAL_PRICE=9000;
+const DB={
+  "2026-03-02":{ci:"08:00",co:"18:00",work:600,ot:0,meals:1,expB:0,expL:7500,expD:0,expE:0},
+  "2026-03-03":{ci:"07:30",co:"20:00",work:750,ot:150,meals:2,expB:4000,expL:8500,expD:12000,expE:0},
+  "2026-03-04":{ci:"08:10",co:"18:00",work:590,ot:0,meals:1,expB:0,expL:6000,expD:0,expE:0},
+  "2026-03-05":{ci:"08:00",co:"21:30",work:810,ot:240,meals:2,expB:0,expL:9500,expD:15000,expE:0},
+  "2026-03-06":{ci:"08:00",co:"17:30",work:570,ot:0,meals:1,expB:0,expL:7000,expD:0,expE:0},
+  "2026-03-09":{ci:"08:00",co:"19:00",work:660,ot:60,meals:2,expB:0,expL:8000,expD:10000,expE:2000},
+  "2026-03-10":{ci:"08:00",co:"18:00",work:600,ot:0,meals:1,expB:0,expL:7500,expD:0,expE:0},
+  "2026-03-11":{ci:"07:50",co:"22:00",work:850,ot:240,meals:2,expB:3500,expL:9000,expD:14000,expE:0},
+  "2026-03-14":{ci:"08:00",co:"19:30",work:690,ot:90,meals:2,expB:0,expL:8000,expD:11000,expE:0},
+  "2026-03-16":{ci:"09:00",co:"17:00",work:480,ot:240,meals:1,expB:0,expL:10000,expD:0,expE:0},
+};
+let yr=2026,mo=2,selectedDate=null;
+const pad=(y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+const toMin=t=>{if(!t)return null;const[h,m]=t.split(":").map(Number);return h*60+m;};
+const fmtMin=m=>{if(!m||m<=0)return"0분";const h=Math.floor(m/60),n=m%60;return h>0?`${h}h${n>0?" "+n+"m":""}`:n+"분";};
+const fmtW=n=>n.toLocaleString("ko-KR")+"원";
+const isWE=dk=>{const d=new Date(dk).getDay();return d===0||d===6;};
+const totalExp=r=>(r.expB||0)+(r.expL||0)+(r.expD||0)+(r.expE||0);
+const mealIn=r=>(r.meals||0)*MEAL_PRICE;
+const mealNet=r=>mealIn(r)-totalExp(r);
+function calcR(ci,co,dk){
+  const i=toMin(ci),o=toMin(co);
+  if(!i||!o)return{work:null,ot:null,meals:0};
+  const work=o-i,we=isWE(dk);
+  const ot=we?Math.max(0,Math.min(240,work)):Math.max(0,Math.min(240,work-540-60));
+  let meals=0;
+  if(we){if(work>=60)meals=1;}
+  else{const ov=(s,e)=>Math.max(0,Math.min(o,e)-Math.max(i,s));if(ov(420,540)>=60)meals++;if(ov(1080,1260)>=60)meals++;}
+  return{work,ot,meals};
+}
+// 테마: #app에 class로 적용, CSS 변수는 #app 스코프
+let _curAcc='blue', _curBg='light';
+function setAcc(t){
+  const app=document.getElementById("app");
+  // 기존 acc-* 클래스 제거 후 추가
+  app.classList.remove('acc-blue','acc-green','acc-purple','acc-rose','acc-orange','acc-teal');
+  app.classList.add('acc-'+t);
+  _curAcc=t;
+  document.querySelectorAll('[id^="acc-"]').forEach(s=>s.classList.remove("on"));
+  document.getElementById("acc-"+t).classList.add("on");
+  if(chartInst)setTimeout(renderChart,50);
+}
+function setBg(t){
+  const app=document.getElementById("app");
+  app.classList.remove('bg-light','bg-warm','bg-dark','bg-amoled');
+  app.classList.add('bg-'+t);
+  _curBg=t;
+  document.querySelectorAll('[id^="bg-"]').forEach(s=>s.classList.remove("on"));
+  document.getElementById("bg-"+t).classList.add("on");
+  if(chartInst)setTimeout(renderChart,50);
+}
+function renderCal(){
+  const days=new Date(yr,mo+1,0).getDate();
+  const tn=new Date(),todayKey=pad(tn.getFullYear(),tn.getMonth(),tn.getDate());
+  const jsFirst=new Date(yr,mo,1).getDay();
+  const offset=jsFirst===0?6:jsFirst-1;
+  document.getElementById("monthYear").textContent=yr+"년";
+  document.getElementById("monthBig").textContent=mo+1;
+  document.getElementById("statsTitle").textContent=(mo+1)+"월 통계";
+  const grid=document.getElementById("calGrid");grid.innerHTML="";
+  let row=mkRow();grid.appendChild(row);let col=0;
+  for(let i=0;i<offset;i++){row.appendChild(document.createElement("div"));col++;}
+  for(let d=1;d<=days;d++){
+    if(col===7){row=mkRow();grid.appendChild(row);col=0;}
+    const dk=pad(yr,mo,d),r=DB[dk],hol=HOL[dk];
+    const jsDay=new Date(dk).getDay(),isSun=jsDay===0,isSat=jsDay===6;
+    const isToday=dk===todayKey,isSel=dk===selectedDate;
+    const cell=document.createElement("div");
+    cell.className="dcell"+(isToday?" is-today":isSel?" is-sel":"");
+    cell.onclick=()=>{selectDay(dk);showDaySheet(dk);};
+    const ring=document.createElement("div");ring.className="dnum-ring";
+    const dn=document.createElement("div");dn.className="dnum";
+    if(!isToday)dn.style.color=hol?"var(--sun-c)":isSun?"var(--sun-c)":isSat?"var(--sat-c)":"var(--t1)";
+    dn.textContent=d;ring.appendChild(dn);cell.appendChild(ring);
+    if(r){
+      const el=document.createElement("div");el.className="ev-list";
+      if(r.ot>0){const b=document.createElement("div");b.className="ev";b.style.background="var(--ot-c)";b.textContent="+"+fmtMin(r.ot);el.appendChild(b);}
+      const b2=document.createElement("div");b2.className="ev";b2.style.background="var(--acc)";b2.textContent=r.ci+" 출근";el.appendChild(b2);
+      const net=mealNet(r);
+      const b3=document.createElement("div");b3.className="ev";b3.style.background=net>=0?"var(--meal-c)":"var(--neg-c)";b3.textContent=(net>=0?"▲":"▼")+fmtW(Math.abs(net));el.appendChild(b3);
+      cell.appendChild(el);
+    }
+    row.appendChild(cell);col++;
+  }
+  while(col%7!==0&&col!==0){row.appendChild(document.createElement("div"));col++;}
+  let tw=0,tot=0,tIn=0,tOut=0;
+  for(let d=1;d<=days;d++){const r=DB[pad(yr,mo,d)];if(!r)continue;tw+=r.work||0;tot+=r.ot||0;tIn+=mealIn(r);tOut+=totalExp(r);}
+  const tNet=tIn-tOut;
+  document.getElementById("sumWork").textContent=fmtMin(tw);
+  document.getElementById("sumOt").textContent=fmtMin(tot);
+  document.getElementById("sumMealNet").textContent=(tNet>=0?"+":"-")+fmtW(Math.abs(tNet));
+  document.getElementById("sumMealNet").style.color=tNet>=0?"var(--meal-c)":"var(--neg-c)";
+  document.getElementById("stWork").textContent=fmtMin(tw);
+  document.getElementById("stOt").textContent=fmtMin(tot);
+  document.getElementById("stMealIn").textContent=fmtW(tIn);
+  document.getElementById("stMealNet").textContent=(tNet>=0?"+":"-")+fmtW(Math.abs(tNet));
+  document.getElementById("stMealNet").style.color=tNet>=0?"var(--meal-c)":"var(--neg-c)";
+  const wDays=Object.keys(DB).filter(k=>k.startsWith(`${yr}-${String(mo+1).padStart(2,"0")}`)).length;
+  document.getElementById("st2Days").textContent=wDays+"일";
+  document.getElementById("st2In").textContent="+"+fmtW(tIn);
+  document.getElementById("st2Out").textContent="-"+fmtW(tOut);
+  document.getElementById("st2Net").textContent=(tNet>=0?"+":"-")+fmtW(Math.abs(tNet));
+  document.getElementById("st2Net").style.color=tNet>=0?"var(--meal-c)":"var(--neg-c)";
+  if(!selectedDate)selectDay(todayKey);
+}
+function mkRow(){const r=document.createElement("div");r.className="cal-row";return r;}
+function selectDay(dk){
+  selectedDate=dk;renderCal();
+  const dt=new Date(dk),jsDay=dt.getDay(),mm=parseInt(dk.slice(5,7)),dd=parseInt(dk.slice(8,10));
+  document.getElementById("detailDateLbl").textContent=`${yr}년 ${mm}월 ${dd}일 (${WKKO[jsDay]})`;
+  const hol=HOL[dk],we=isWE(dk),tag=document.getElementById("detailTag");
+  if(hol){tag.textContent=hol;tag.style.background="#fee2e2";tag.style.color="var(--sun-c)";tag.style.display="";}
+  else if(we){tag.textContent="주말";tag.style.background="var(--acc-soft)";tag.style.color="var(--acc-text)";tag.style.display="";}
+  else tag.style.display="none";
+  const r=DB[dk],list=document.getElementById("detailList");
+  if(!r){list.innerHTML='<div class="detail-empty">기록 없음<br><span style="font-size:12px">하단 버튼으로 입력하세요</span></div>';return;}
+  list.innerHTML="";
+  // 근무 카드
+  const wc=document.createElement("div");wc.className="dcard";
+  const wb=document.createElement("div");wb.className="dcard-bar";wb.style.background=we?"var(--ot-c)":"var(--acc)";
+  const wbd=document.createElement("div");wbd.className="dcard-body";
+  wbd.innerHTML=`<div class="dcard-title">${hol||"근무기록"} ${we?"🏖️":"💼"}</div><div class="dcard-time"><span>${r.ci}</span><span style="color:var(--t3)">→</span><span>${r.co}</span><span style="color:var(--t3);font-size:11px">${fmtMin(r.work)}</span></div><div class="dcard-chips">${r.ot>0?`<span class="chip chip-ot">초과 +${fmtMin(r.ot)}</span>`:""}${r.meals>0?`<span class="chip chip-meal">급량 ${r.meals}회</span>`:""}${we?`<span class="chip chip-we">주말</span>`:""}</div>`;
+  wc.append(wb,wbd);list.appendChild(wc);
+  // 급량비 수지 카드
+  const income=mealIn(r),expense=totalExp(r),net=income-expense;
+  // expParts 불필요 (단일 지출로 변경)
+  const mc=document.createElement("div");mc.className="mfcard";
+  mc.innerHTML=`<div class="mfc-title">🍽 급량비 수지</div><div class="mfc-row"><span class="mfc-label">수령액 (${r.meals}회 × 9,000원)</span><span class="mfc-val pos">+${fmtW(income)}</span></div><div class="mfc-row"><span class="mfc-label">식비 지출</span><span class="mfc-val neg">-${fmtW(expense)}</span></div><div class="mfc-row"><span class="mfc-label" style="font-weight:700;color:var(--t1)">순수 수지</span><span class="mfc-val mfc-net" style="color:${net>=0?"var(--pos-c)":"var(--neg-c)"}">${net>=0?"+":"-"}${fmtW(Math.abs(net))}</span></div>`;
+  list.appendChild(mc);
+}
+function showView(v){
+  document.getElementById("viewCal").style.display=v==="cal"?"flex":"none";
+  document.getElementById("viewStats").style.display=v==="stats"?"flex":"none";
+  document.getElementById("viewSettings").style.display=v==="settings"?"flex":"none";
+  ["cal","stats","settings"].forEach((n,i)=>document.querySelectorAll(".npill")[i].classList.toggle("on",n===v));
+  if(v==="stats")renderChart();
+}
+let chartInst=null;
+function renderChart(){
+  const ctx=document.getElementById("workChart");
+  if(chartInst){chartInst.destroy();chartInst=null;}
+  const app=document.getElementById("app");
+  const cs=getComputedStyle(app);
+  const ac=cs.getPropertyValue("--acc").trim();
+  const oc=cs.getPropertyValue("--ot-c").trim();
+  const bc=cs.getPropertyValue("--border").trim();
+  const t3=cs.getPropertyValue("--t3").trim();
+  const labels=[],work=[],ot=[];
+  for(let d=1;d<=31;d++){const dk=pad(yr,mo,d);const r=DB[dk];if(!r)continue;labels.push(d+"일");work.push((r.work||0)-(r.ot||0));ot.push(r.ot||0);}
+  chartInst=new Chart(ctx,{type:"bar",data:{labels,datasets:[{label:"근무",data:work,backgroundColor:ac+"99",borderRadius:4,stack:"s"},{label:"초과",data:ot,backgroundColor:oc+"cc",borderRadius:4,stack:"s"}]},options:{responsive:true,plugins:{legend:{position:"bottom",labels:{font:{size:10},boxWidth:10,color:t3}}},scales:{x:{ticks:{font:{size:9},color:t3},grid:{display:false}},y:{ticks:{font:{size:9},callback:v=>v+"분",color:t3},grid:{color:bc}}}}});
+}
+let _mDate=null;
+function openModal(dk){
+  if(!dk)return;
+  _mDate=dk;
+  const dt=new Date(dk),jsDay=dt.getDay(),mm=parseInt(dk.slice(5,7)),dd=parseInt(dk.slice(8,10));
+  document.getElementById("mDate").textContent=`${mm}월 ${dd}일 ${WKKO[jsDay]}요일`;
+  const hol=HOL[dk],we=isWE(dk),badge=document.getElementById("mBadge");
+  badge.textContent=hol||(we?"주말":"평일");
+  badge.style.background=hol?"#fee2e2":we?"var(--acc-soft)":"var(--surface)";
+  badge.style.color=hol?"var(--sun-c)":we?"var(--acc-text)":"var(--t3)";
+  document.getElementById("mHint").textContent=we?"📌 주말: 자동공제 없음 · 최대 4시간":"📌 평일: 자동공제 60분 · 최대 4시간";
+  const r=DB[dk]||{};
+  document.getElementById("inTime").value=r.ci||"08:00";
+  document.getElementById("outTime").value=r.co||"18:00";
+  document.getElementById("expTotal").value=((r.expB||0)+(r.expL||0)+(r.expD||0)+(r.expE||0))||0;
+  document.getElementById("mDelBtn").style.display=DB[dk]?"":"none";
+  liveCalc();
+  document.getElementById("modalOv").classList.add("open");
+}
+function closeModal(e){if(e&&e.target!==document.getElementById("modalOv"))return;document.getElementById("modalOv").classList.remove("open");}
+function liveCalc(){
+  const dk=_mDate||pad(yr,mo,new Date().getDate());
+  const c=calcR(document.getElementById("inTime").value,document.getElementById("outTime").value,dk);
+  document.getElementById("lcWork").textContent=c.work?fmtMin(c.work):"—";
+  document.getElementById("lcOt").textContent=c.ot!=null?fmtMin(c.ot):"—";
+  document.getElementById("lcMeals").textContent=(c.meals||0)+"회";
+  const income=(c.meals||0)*MEAL_PRICE;
+  const expense=parseInt(document.getElementById("expTotal").value)||0;
+  const net=income-expense;
+  document.getElementById("mbpIn").textContent="+"+fmtW(income);
+  document.getElementById("mbpOut").textContent="-"+fmtW(expense);
+  document.getElementById("mbpNet").textContent=(net>=0?"+":"-")+fmtW(Math.abs(net));
+  document.getElementById("mbpNet").style.color=net>=0?"var(--pos-c)":"var(--neg-c)";
+}
+
+function showDaySheet(dk) {
+  const dt = new Date(dk), jsDay = dt.getDay();
+  const mm = parseInt(dk.slice(5,7)), dd = parseInt(dk.slice(8,10));
+  document.getElementById("dsDate").textContent = mm+"월 "+dd+"일 "+WKKO[jsDay]+"요일";
+  const hol = HOL[dk], we = isWE(dk), badge = document.getElementById("dsBadge");
+  badge.textContent = hol||(we?"주말":"평일");
+  badge.style.background = hol?"#fee2e2":we?"var(--acc-soft)":"var(--surface)";
+  badge.style.color = hol?"var(--sun-c)":we?"var(--acc-text)":"var(--t3)";
+  const r = DB[dk];
+  document.getElementById("dsEmpty").style.display = r?"none":"";
+  document.getElementById("dsContent").style.display = r?"":"none";
+  // 편집 버튼 표시 여부
+  document.querySelector("#daySheetOv .modal-sheet button:first-of-type").style.display = r?"":"none";
+  if(r) {
+    document.getElementById("dsWorkTitle").textContent = (hol||"근무기록")+" "+(we?"🏖️":"💼");
+    document.getElementById("dsWorkTime").textContent = r.ci+" → "+r.co+"  "+fmtMin(r.work);
+    const chips = document.getElementById("dsChips");
+    chips.innerHTML = "";
+    if(r.ot>0) chips.innerHTML += `<span class="chip chip-ot">초과 +${fmtMin(r.ot)}</span>`;
+    if(r.meals>0) chips.innerHTML += `<span class="chip chip-meal">급량 ${r.meals}회</span>`;
+    if(we) chips.innerHTML += `<span class="chip chip-we">주말</span>`;
+    const income = mealIn(r), expense = totalExp(r), net = income - expense;
+    document.getElementById("dsIncomeLabel").textContent = "수령액 ("+r.meals+"회 × 9,000원)";
+    document.getElementById("dsIncome").textContent = "+"+fmtW(income);
+    document.getElementById("dsExpense").textContent = "-"+fmtW(expense);
+    document.getElementById("dsNet").textContent = (net>=0?"+":"-")+fmtW(Math.abs(net));
+    document.getElementById("dsNet").style.color = net>=0?"var(--pos-c)":"var(--neg-c)";
+  }
+  document.getElementById("daySheetOv").classList.add("open");
+}
+function closeDaySheet(e) {
+  if(e && e.target !== document.getElementById("daySheetOv")) return;
+  document.getElementById("daySheetOv").classList.remove("open");
+}
+function enterApp(){
+  const username = document.querySelector("#loginScreen .lf-input").value || "사용자";
+  document.getElementById("userNickname").textContent = username;
+  document.getElementById("userAvatar").textContent = username.charAt(0);
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("mainApp").style.display="flex";
+  renderCal();
+}
+function goLogin(){document.getElementById("mainApp").style.display="none";document.getElementById("loginScreen").style.display="flex";}
+function changeMonth(d){mo+=d;if(mo>11){mo=0;yr++;}else if(mo<0){mo=11;yr--;}selectedDate=null;renderCal();}
+document.addEventListener("keydown",e=>{if(e.key==="ArrowLeft")changeMonth(-1);if(e.key==="ArrowRight")changeMonth(1);});
+</script>
+</body>
+</html>
