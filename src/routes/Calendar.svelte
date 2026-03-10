@@ -56,6 +56,10 @@
     selectedDate.set(dateStr);
   }
 
+  function closeDetail() {
+    selectedDate.set(null);
+  }
+
   function prevMonth() {
     if (viewMonth === 0) { viewYear--; viewMonth = 11; }
     else viewMonth--;
@@ -179,13 +183,17 @@
   {/each}
 </div>
 
-<!-- 상세 영역 (DaySheet) -->
-<div class="detail-wrap">
-  <DaySheet
-    date={$selectedDate}
-    on:edit={e => dispatch('openModal', { date: e.detail.date })}
-    on:add={e => dispatch('openModal', { date: e.detail.date })}
-    on:quickClock
-    on:quickMeal
-  />
+<!-- 상세 바텀시트 오버레이 -->
+<div class="ds-overlay" class:open={!!$selectedDate} on:click|self={closeDetail}>
+  <div class="ds-sheet">
+    <div class="ds-handle"></div>
+    <DaySheet
+      date={$selectedDate}
+      on:edit={e => { closeDetail(); dispatch('openModal', { date: e.detail.date }); }}
+      on:add={e => { closeDetail(); dispatch('openModal', { date: e.detail.date }); }}
+      on:quickClock
+      on:quickMeal
+      on:close={closeDetail}
+    />
+  </div>
 </div>

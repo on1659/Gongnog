@@ -1,4 +1,46 @@
 ========================================
+📋 Summit Log - 2026-03-10 (4차)
+========================================
+
+## 변경 파일
+- src/routes/Calendar.svelte: 인라인 상세 → 바텀시트 오버레이 전환
+- src/routes/DaySheet.svelte: 전체 리라이트 (바텀시트 전용 구조)
+- src/app.css: qs-*/detail-* 스타일 제거 → ds-* 바텀시트 스타일 추가
+
+## 상세 변경 내역
+
+### [A안: 바텀시트 오버레이 적용]
+- 문제: 모바일(390px)에서 캘린더 그리드(~372px) + 헤더(~200px) + 바텀바(~50px) = ~622px
+  → 100vh 초과, 날짜 클릭 시 상세 영역(DaySheet)이 거의 보이지 않음
+- 팀 회의(docs/calendar-detail-ux-meeting.md) 결과 A안(바텀시트 오버레이) 채택
+- 기존 인라인 detail-wrap → fixed 오버레이 ds-overlay로 전환
+
+### [Calendar.svelte 변경]
+- detail-wrap div 제거 → ds-overlay 바텀시트 오버레이 추가
+- closeDetail() 함수 추가: selectedDate.set(null)
+- DaySheet edit/add 이벤트: closeDetail() 후 openModal 디스패치
+- ds-sheet: max-height 70vh, border-radius 22px, slide-up transition
+
+### [DaySheet.svelte 전체 리라이트]
+- qs-overlay/qs-sheet (퀵 액션 별도 바텀시트) 제거
+- DaySheet 자체가 바텀시트 콘텐츠가 됨
+- ds-hdr: 날짜 + 요일 + 태그(공휴일/주말/오늘)
+- ds-body: 오늘이면 퀵 액션(출근/퇴근/식사) 인라인 표시
+- 기록 있으면: 근무 카드(dcard) + 급량비 수지 카드(mfcard)
+- 기록 없으면: "기록이 없습니다" + 기록 입력 버튼
+- 식사 팝업(meal-popup) 유지
+
+### [CSS 변경]
+- 제거: .qs-overlay, .qs-sheet, .qs-handle, .qs-title, .qs-actions, .qs-close-btn
+- 제거: .detail-wrap, .detail-hdr, .detail-date, .detail-tag, .detail-list, .detail-empty
+- 추가: .ds-overlay (fixed inset:0, backdrop blur, z-index:150, opacity transition)
+- 추가: .ds-sheet (bg:var(--bg), border-radius:22px, max-height:70vh, slide-up)
+- 추가: .ds-handle, .ds-hdr, .ds-date, .ds-tag, .ds-body, .ds-quick, .ds-empty, .ds-add-btn
+- .qa-btn, .qa-done, .meal-popup-* 스타일 유지 (바텀시트 내부 재사용)
+
+========================================
+
+========================================
 📋 Summit Log - 2026-03-10 (3차)
 ========================================
 
