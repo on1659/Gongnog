@@ -1,4 +1,36 @@
 ========================================
+📋 Summit Log - 2026-03-10 (3차)
+========================================
+
+## 변경 파일
+- src/routes/DaySheet.svelte: 퀵 액션 바텀시트 + 식사 금액 팝업
+- src/app.css: 바텀시트/팝업 CSS 추가
+
+## 상세 변경 내역
+
+### [퀵 액션 바텀시트 전환]
+- DaySheet의 인라인 quick-actions를 별도 바텀시트 오버레이로 분리
+- .qs-overlay + .qs-sheet: fixed 바텀시트, slide-up 애니메이션
+- 오늘 날짜 선택 시 자동 열림 (isToday reactive)
+- 오버레이 클릭 또는 닫기 버튼으로 시트 닫기
+- 기존 근무 카드/급량비 카드는 detail-list에 오늘/과거 공통으로 통합
+
+### [식사 금액 입력 팝업]
+- 기존: 식사 버튼 클릭 → 즉시 mealPrice 누적
+- 변경: 식사 버튼 클릭 → .meal-popup-overlay 팝업 열림
+- 팝업에 금액 input (기본값: 설정의 mealPrice), 확인/취소 버튼
+- 확인 시 입력 금액으로 mealExpense 누적, 취소 시 팝업만 닫힘
+- 3회차 이상 시 기존 confirm 유지 (팝업 열기 전 확인)
+
+### [CSS 변경]
+- .quick-actions 클래스 제거 → .qs-actions로 대체 (바텀시트 내부용)
+- .qs-overlay, .qs-sheet, .qs-handle, .qs-title, .qs-close-btn 추가
+- .meal-popup-overlay, .meal-popup, .meal-popup-* 스타일 추가
+- 기존 .qa-btn, .qa-done 등은 유지 (바텀시트 내부에서 재사용)
+
+========================================
+
+========================================
 📋 Summit Log - 2026-03-10 (2차)
 ========================================
 

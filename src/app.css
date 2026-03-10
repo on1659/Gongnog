@@ -98,8 +98,16 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .ev-in { background: var(--acc); }
 .ev-meal { }
 
-/* ── 퀵 액션 버튼 ── */
-.quick-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+/* ── 퀵 액션 바텀시트 ── */
+.qs-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.4); backdrop-filter: blur(4px); z-index: 150; opacity: 0; pointer-events: none; transition: opacity .25s; display: flex; align-items: flex-end; justify-content: center; }
+.qs-overlay.open { opacity: 1; pointer-events: all; }
+.qs-sheet { background: var(--bg); border-radius: 22px 22px 0 0; padding: 14px 20px 32px; width: 100%; max-width: 390px; transform: translateY(100%); transition: transform .3s cubic-bezier(.25,.46,.45,.94); }
+.qs-overlay.open .qs-sheet { transform: none; }
+.qs-handle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
+.qs-title { font-size: 16px; font-weight: 700; color: var(--t1); margin-bottom: 14px; text-align: center; }
+.qs-actions { display: flex; gap: 8px; margin-bottom: 14px; }
+.qs-close-btn { width: 100%; padding: 13px; border-radius: 14px; border: none; background: var(--surface); font-size: 14px; font-weight: 600; color: var(--t2); cursor: pointer; }
+
 .qa-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; transition: transform .1s; position: relative; }
 .qa-btn:active { transform: scale(.95); }
 .qa-clockin { border-color: var(--acc); background: var(--acc-soft); }
@@ -115,6 +123,21 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .qa-done-icon { font-size: 16px; opacity: .5; }
 .qa-done-label { font-size: 10px; font-weight: 600; color: var(--t3); }
 .qa-done-time { font-size: 15px; font-weight: 700; color: var(--t1); }
+
+/* ── 식사 금액 팝업 ── */
+.meal-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(6px); z-index: 250; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.meal-popup-overlay.open { opacity: 1; pointer-events: all; }
+.meal-popup { background: var(--bg); border-radius: 20px; padding: 24px; width: 300px; max-width: 90vw; box-shadow: 0 8px 40px rgba(0,0,0,.2); transform: scale(.9); transition: transform .2s; }
+.meal-popup-overlay.open .meal-popup { transform: scale(1); }
+.meal-popup-title { font-size: 17px; font-weight: 700; color: var(--t1); text-align: center; margin-bottom: 4px; }
+.meal-popup-desc { font-size: 12px; color: var(--t3); text-align: center; margin-bottom: 18px; }
+.meal-popup-input-wrap { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.meal-popup-input { flex: 1; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--border); font-size: 18px; font-weight: 600; text-align: right; outline: none; background: var(--surface); color: var(--t1); }
+.meal-popup-input:focus { border-color: var(--acc); }
+.meal-popup-unit { font-size: 15px; font-weight: 600; color: var(--t2); }
+.meal-popup-btns { display: flex; gap: 8px; }
+.meal-popup-cancel { flex: 1; padding: 13px; border-radius: 14px; border: none; background: var(--surface); font-size: 14px; font-weight: 600; color: var(--t2); cursor: pointer; }
+.meal-popup-confirm { flex: 1; padding: 13px; border-radius: 14px; border: none; background: var(--acc); font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; }
 
 /* ── 상세 영역 ── */
 .detail-wrap { flex: 1; border-top: 1px solid var(--border); overflow-y: auto; min-height: 0; }
