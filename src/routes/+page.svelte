@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { settings, records, currentView, selectedDate } from '$lib/stores.js';
+  import { fmtW } from '$lib/constants.js';
   import Calendar from './Calendar.svelte';
   import Stats from './Stats.svelte';
   import Settings from './Settings.svelte';
@@ -92,6 +93,26 @@
     closeModal();
   }
 
+  async function handleQuickMeal(e) {
+    const { date, mealExpense } = e.detail;
+    const existing = $records[date];
+    const res = await fetch(`/api/records/${date}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkIn: existing?.checkIn || null,
+        checkOut: existing?.checkOut || null,
+        mealExpense,
+        memo: existing?.memo || ''
+      })
+    });
+    if (res.ok) {
+      const { record } = await res.json();
+      records.update(r => ({ ...r, [date]: record }));
+      showToast(`식사 ${fmtW(mealExpense)} 기록됨`, date);
+    }
+  }
+
   async function handleMonthChange(e) {
     await loadRecords(e.detail.year, e.detail.month);
   }
@@ -102,6 +123,8 @@
     user={data.user}
     on:openModal={e => openModal(e.detail.date)}
     on:monthChange={handleMonthChange}
+    on:quickClock={handleQuickClock}
+    on:quickMeal={handleQuickMeal}
   />
 {:else if $currentView === 'stats'}
   <Stats />

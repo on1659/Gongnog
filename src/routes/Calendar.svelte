@@ -184,5 +184,7 @@
     date={$selectedDate}
     on:edit={e => dispatch('openModal', { date: e.detail.date })}
     on:add={e => dispatch('openModal', { date: e.detail.date })}
+    on:quickClock
+    on:quickMeal
   />
 </div>

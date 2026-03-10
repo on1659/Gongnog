@@ -98,6 +98,24 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .ev-in { background: var(--acc); }
 .ev-meal { }
 
+/* ── 퀵 액션 버튼 ── */
+.quick-actions { display: flex; gap: 8px; margin-bottom: 10px; }
+.qa-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; transition: transform .1s; position: relative; }
+.qa-btn:active { transform: scale(.95); }
+.qa-clockin { border-color: var(--acc); background: var(--acc-soft); }
+.qa-clockin .qa-label { color: var(--acc); }
+.qa-clockout { border-color: var(--ot-c); background: var(--chip-ot-bg); }
+.qa-clockout .qa-label { color: var(--ot-c); }
+.qa-meal { border-color: var(--meal-c); background: var(--chip-meal-bg); }
+.qa-meal .qa-label { color: var(--meal-c); }
+.qa-icon { font-size: 22px; }
+.qa-label { font-size: 13px; font-weight: 700; color: var(--t1); }
+.qa-badge { position: absolute; top: 6px; right: 8px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--meal-c); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.qa-done { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 8px; border-radius: 14px; background: var(--surface); }
+.qa-done-icon { font-size: 16px; opacity: .5; }
+.qa-done-label { font-size: 10px; font-weight: 600; color: var(--t3); }
+.qa-done-time { font-size: 15px; font-weight: 700; color: var(--t1); }
+
 /* ── 상세 영역 ── */
 .detail-wrap { flex: 1; border-top: 1px solid var(--border); overflow-y: auto; min-height: 0; }
 .detail-hdr { padding: 16px 20px 8px; display: flex; align-items: center; justify-content: space-between; }

@@ -7,19 +7,47 @@
 
   const dispatch = createEventDispatcher();
 
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
   $: rec = date ? $records[date] : null;
   $: dow = date ? WKKO[new Date(date).getDay()] : '';
   $: holiday = date ? HOLIDAYS[date] : null;
   $: weekend = date ? isWeekend(date) : false;
+  $: isToday = date === todayStr();
   $: mealPrice = date
     ? (isWeekend(date) ? $settings.mealPriceWeekend : $settings.mealPriceWeekday)
     : $settings.mealPriceWeekday;
   $: income = (rec?.meals || 0) * mealPrice;
   $: net = income - (rec?.mealExpense || 0);
+  $: mealCount = rec?.mealExpense ? Math.round(rec.mealExpense / mealPrice) : 0;
 
   function fmtDate(d) {
     if (!d) return '';
     return `${parseInt(d.slice(5,7))}월 ${parseInt(d.slice(-2))}일`;
+  }
+
+  function handleClockIn() {
+    const d = new Date();
+    const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    dispatch('quickClock', { date, checkIn: t, checkOut: null });
+  }
+
+  function handleClockOut() {
+    const d = new Date();
+    const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    dispatch('quickClock', { date, checkIn: rec.checkIn, checkOut: t });
+  }
+
+  function handleMeal() {
+    const currentCount = mealCount;
+    if (currentCount >= 2) {
+      if (!confirm(`오늘 식사를 ${currentCount}회 하셨습니다. 더 추가하시는게 맞습니까?`)) return;
+    }
+    const newExpense = (rec?.mealExpense || 0) + mealPrice;
+    dispatch('quickMeal', { date, mealExpense: newExpense });
   }
 </script>
 
@@ -30,12 +58,102 @@
       <div class="detail-tag" style="color:var(--sun-c)">{holiday}</div>
     {:else if weekend}
       <div class="detail-tag" style="color:var(--sat-c)">주말</div>
+    {:else if isToday}
+      <div class="detail-tag" style="color:var(--acc)">오늘</div>
     {/if}
   </div>
 
   <div class="detail-list">
-    {#if rec && rec.checkIn}
-      <!-- 근무 카드 -->
+    {#if isToday}
+      <!-- 오늘: 퀵 액션 버튼 -->
+      <div class="quick-actions">
+        {#if !rec?.checkIn}
+          <button class="qa-btn qa-clockin" on:click={handleClockIn}>
+            <span class="qa-icon">&#128340;</span>
+            <span class="qa-label">출근</span>
+          </button>
+        {:else}
+          <div class="qa-done">
+            <span class="qa-done-icon">&#128340;</span>
+            <span class="qa-done-label">출근</span>
+            <span class="qa-done-time">{rec.checkIn}</span>
+          </div>
+        {/if}
+
+        {#if rec?.checkIn && !rec?.checkOut}
+          <button class="qa-btn qa-clockout" on:click={handleClockOut}>
+            <span class="qa-icon">&#128682;</span>
+            <span class="qa-label">퇴근</span>
+          </button>
+        {:else if rec?.checkOut}
+          <div class="qa-done">
+            <span class="qa-done-icon">&#128682;</span>
+            <span class="qa-done-label">퇴근</span>
+            <span class="qa-done-time">{rec.checkOut}</span>
+          </div>
+        {/if}
+
+        <button class="qa-btn qa-meal" on:click={handleMeal}>
+          <span class="qa-icon">&#127858;</span>
+          <span class="qa-label">식사</span>
+          {#if mealCount > 0}
+            <span class="qa-badge">{mealCount}</span>
+          {/if}
+        </button>
+      </div>
+
+      {#if rec && rec.checkIn}
+        <!-- 근무 카드 -->
+        <div class="dcard">
+          <div class="dcard-bar"></div>
+          <div class="dcard-body">
+            <div class="dcard-title">근무 기록</div>
+            <div class="dcard-time">
+              {rec.checkIn} → {rec.checkOut || '--:--'}
+              {#if rec.workMin}
+                <span style="color:var(--t3)">|</span>
+                {fmtMin(rec.workMin)}
+              {/if}
+            </div>
+            <div class="dcard-chips">
+              {#if rec.otMin > 0}
+                <span class="chip chip-ot">초과 {fmtMin(rec.otMin)}</span>
+              {/if}
+              {#if rec.meals > 0}
+                <span class="chip chip-meal">급량 {rec.meals}회</span>
+              {/if}
+              {#if weekend || holiday}
+                <span class="chip chip-we">{holiday ? '공휴일' : '주말'}</span>
+              {/if}
+            </div>
+            {#if rec.memo}
+              <div style="font-size:12px;color:var(--t3);margin-top:6px">{rec.memo}</div>
+            {/if}
+          </div>
+          <button class="dcard-edit" on:click={() => dispatch('edit', { date })}>✏️</button>
+        </div>
+
+        {#if rec.meals > 0 || rec.mealExpense > 0}
+          <div class="mfcard">
+            <div class="mfc-title">급량비 수지</div>
+            <div class="mfc-row">
+              <span class="mfc-label">수령액 ({rec.meals || 0}회)</span>
+              <span class="mfc-val pos">{fmtW(income)}</span>
+            </div>
+            <div class="mfc-row">
+              <span class="mfc-label">식비 지출 ({mealCount}회)</span>
+              <span class="mfc-val neg">-{fmtW(rec.mealExpense || 0)}</span>
+            </div>
+            <div class="mfc-row">
+              <span class="mfc-label">순수 수지</span>
+              <span class="mfc-val mfc-net" class:pos={net >= 0} class:neg={net < 0}>{fmtW(net)}</span>
+            </div>
+          </div>
+        {/if}
+      {/if}
+
+    {:else if rec && rec.checkIn}
+      <!-- 과거/미래 날짜: 기존 방식 -->
       <div class="dcard">
         <div class="dcard-bar"></div>
         <div class="dcard-body">
@@ -63,7 +181,6 @@
         <button class="dcard-edit" on:click={() => dispatch('edit', { date })}>✏️</button>
       </div>
 
-      <!-- 급량비 수지 카드 -->
       {#if rec.meals > 0 || rec.mealExpense > 0}
         <div class="mfcard">
           <div class="mfc-title">급량비 수지</div>
