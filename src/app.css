@@ -86,6 +86,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .dnum { font-size: 14px; font-weight: 500; color: var(--t1); }
 .dcell.is-today .dnum-ring { background: var(--today-bg); }
 .dcell.is-today .dnum { color: #fff !important; }
+.dcell.is-sel:not(.other-month) { background: var(--surface); }
 .dcell.is-sel:not(.is-today) .dnum-ring { background: var(--acc-soft); border: 1.5px solid var(--acc); }
 .dcell.is-sel:not(.is-today) .dnum { color: var(--acc-text) !important; }
 .dcell.is-sun .dnum { color: var(--sun-c); }
