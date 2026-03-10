@@ -4,6 +4,7 @@
   let password = '';
   let error = '';
   let loading = false;
+  let showSplash = false;
 
   async function submit() {
     error = '';
@@ -17,7 +18,8 @@
     const data = await res.json();
     loading = false;
     if (data.ok) {
-      window.location.href = '/';
+      showSplash = true;
+      setTimeout(() => { window.location.href = '/'; }, 800);
     } else {
       error = data.message;
     }
@@ -49,3 +51,11 @@
     <button style="background:none;border:none;color:var(--acc);font-weight:600;font-size:13px;cursor:pointer;padding:0" on:click={toggleMode}>{mode === 'login' ? '회원가입' : '로그인'}</button>
   </div>
 </div>
+
+{#if showSplash}
+  <div class="splash">
+    <img class="splash-icon" src="/app-icon.svg" alt="공녹" />
+    <div class="splash-name">공녹</div>
+    <div class="splash-desc">공무원 근무기록</div>
+  </div>
+{/if}

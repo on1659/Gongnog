@@ -26,7 +26,13 @@ export function isWeekend(dateStr) {
 export function fmtMin(m) {
   if (!m || m <= 0) return '0분';
   const h = Math.floor(m / 60), n = m % 60;
-  return h > 0 ? `${h}h${n > 0 ? ' ' + n + 'm' : ''}` : n + '분';
+  return h > 0 ? `${h}시간${n > 0 ? ' ' + n + '분' : ''}` : n + '분';
+}
+
+export function fmtTime(t) {
+  if (!t) return '--시 --분';
+  const [h, m] = t.split(':').map(Number);
+  return `${h}시 ${String(m).padStart(2,'0')}분`;
 }
 
 export function fmtW(n) {

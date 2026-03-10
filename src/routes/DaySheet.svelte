@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { settings, records } from '$lib/stores.js';
-  import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW } from '$lib/constants.js';
+  import { settings, records, customConfirm } from '$lib/stores.js';
+  import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW, fmtTime } from '$lib/constants.js';
 
   export let date = null;
 
@@ -44,10 +44,10 @@
     dispatch('quickClock', { date, checkIn: rec.checkIn, checkOut: t });
   }
 
-  function openMealPopup() {
+  async function openMealPopup() {
     const currentCount = mealCount;
     if (currentCount >= 2) {
-      if (!confirm(`오늘 식사를 ${currentCount}회 하셨습니다. 더 추가하시는게 맞습니까?`)) return;
+      if (!await customConfirm(`오늘 식사를 ${currentCount}회 하셨습니다.\n더 추가하시는게 맞습니까?`)) return;
     }
     mealInputAmount = mealPrice;
     showMealPopup = true;
@@ -89,7 +89,7 @@
           <div class="qa-done">
             <span class="qa-done-icon">&#128340;</span>
             <span class="qa-done-label">출근</span>
-            <span class="qa-done-time">{rec.checkIn}</span>
+            <span class="qa-done-time">{fmtTime(rec.checkIn)}</span>
           </div>
         {/if}
 
@@ -102,7 +102,7 @@
           <div class="qa-done">
             <span class="qa-done-icon">&#128682;</span>
             <span class="qa-done-label">퇴근</span>
-            <span class="qa-done-time">{rec.checkOut}</span>
+            <span class="qa-done-time">{fmtTime(rec.checkOut)}</span>
           </div>
         {/if}
 
@@ -122,7 +122,7 @@
         <div class="dcard-body">
           <div class="dcard-title">근무 기록</div>
           <div class="dcard-time">
-            {rec.checkIn} → {rec.checkOut || '--:--'}
+            {fmtTime(rec.checkIn)} → {fmtTime(rec.checkOut)}
             {#if rec.workMin}
               <span style="color:var(--t3)">|</span>
               {fmtMin(rec.workMin)}

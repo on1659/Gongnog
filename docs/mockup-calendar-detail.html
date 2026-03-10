@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>캘린더 상세 영역 — A/B/C안 목업</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:#e5e7eb;display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:20px 10px 40px}
+
+/* 탭 선택 */
+.tab-bar{display:flex;gap:6px;margin-bottom:16px;position:sticky;top:10px;z-index:999;background:#e5e7eb;padding:8px 0;border-radius:14px}
+.tab-btn{padding:10px 18px;border-radius:12px;border:2px solid #d1d5db;background:#fff;font-size:13px;font-weight:700;color:#6b7280;cursor:pointer;transition:.15s}
+.tab-btn.active{background:#1a56db;color:#fff;border-color:#1a56db}
+.tab-btn:hover:not(.active){background:#f3f4f6}
+
+.mockup-title{font-size:20px;font-weight:800;color:#111;margin-bottom:4px;text-align:center}
+.mockup-desc{font-size:12px;color:#6b7280;margin-bottom:16px;text-align:center;max-width:400px;line-height:1.6}
+
+/* 폰 프레임 */
+.phone{width:390px;height:844px;background:#fff;border-radius:44px;box-shadow:0 20px 60px rgba(0,0,0,.15);overflow:hidden;position:relative;display:none;flex-direction:column}
+.phone.show{display:flex}
+
+/* 상단 노치 */
+.notch{height:54px;background:#fff;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;flex-shrink:0}
+.notch-pill{width:120px;height:32px;background:#111;border-radius:20px}
+
+/* 테마 변수 */
+:root{--acc:#1a56db;--acc-soft:#eff6ff;--acc-text:#1e40af;--today-bg:#1e293b;--bg:#fff;--surface:#f2f2f7;--surface2:#e9e9ef;--border:#e5e7eb;--t1:#111827;--t2:#6b7280;--t3:#b0b7c3;--ot-c:#f97316;--meal-c:#16a34a;--neg-c:#ef4444;--sun-c:#ef4444;--sat-c:#3b82f6;--chip-ot-bg:#fff7ed;--chip-meal-bg:#f0fdf4}
+
+/* 공통 헤더 */
+.hdr-top{display:flex;align-items:center;justify-content:space-between;padding:8px 16px 0;flex-shrink:0}
+.nick-chip{display:flex;align-items:center;gap:4px;background:var(--surface);border-radius:7px;padding:3px 8px 3px 4px}
+.nick-av{width:16px;height:16px;border-radius:4px;background:var(--acc);font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center}
+.nick-nm{font-size:11px;font-weight:600;color:var(--t2)}
+.logout-b{width:26px;height:26px;border-radius:7px;background:var(--surface);border:none;color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.today-strip{padding:6px 16px 0;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.today-label{font-size:11px;font-weight:700;color:#fff;background:var(--acc);padding:2px 8px;border-radius:6px}
+.today-date{font-size:12px;font-weight:500;color:var(--t2)}
+
+.hdr-main{display:flex;align-items:flex-end;justify-content:space-between;padding:4px 16px 0;flex-shrink:0}
+.month-year{font-size:13px;font-weight:500;color:var(--t3)}
+.month-big{font-size:48px;font-weight:300;color:var(--t1);letter-spacing:-3px;line-height:1}
+.tb-icons{display:flex;gap:6px;padding-bottom:8px}
+.ico-b{width:32px;height:32px;border-radius:8px;background:var(--surface);border:none;color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+.summary-row{display:flex;gap:6px;padding:8px 14px 0;flex-shrink:0}
+.spill{flex:1;background:var(--surface);border-radius:10px;padding:8px 10px;border-left:3px solid var(--acc)}
+.spill.ot{border-left-color:var(--ot-c)}
+.spill.ml{border-left-color:var(--meal-c)}
+.spill-lbl{font-size:9px;font-weight:600;color:var(--t3)}
+.spill-val{font-size:12px;font-weight:700;color:var(--t1);margin-top:2px}
+
+.wk-hdr{display:grid;grid-template-columns:repeat(7,1fr);padding:10px 10px 4px;flex-shrink:0}
+.wlbl{text-align:center;font-size:10px;font-weight:700;color:var(--t3)}
+.wlbl.sun{color:var(--sun-c)}
+.wlbl.sat{color:var(--sat-c)}
+
+/* 캘린더 그리드 */
+.cal-wrap{padding:0 6px;flex-shrink:0}
+.cal-row{display:grid;grid-template-columns:repeat(7,1fr)}
+.dcell{min-height:62px;padding:3px;display:flex;flex-direction:column;align-items:center;border-radius:8px;cursor:pointer}
+.dcell.other .dnum{color:var(--t3)}
+.dnum-ring{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.dnum{font-size:13px;font-weight:500;color:var(--t1)}
+.dcell.is-today .dnum-ring{background:var(--today-bg)}
+.dcell.is-today .dnum{color:#fff!important}
+.dcell.is-sel:not(.is-today) .dnum-ring{background:var(--acc-soft);border:1.5px solid var(--acc)}
+.dcell.is-sel:not(.is-today) .dnum{color:var(--acc-text)!important}
+.dcell.is-sel{background:var(--surface)}
+.dcell.is-sun .dnum{color:var(--sun-c)}
+.dcell.is-sat .dnum{color:var(--sat-c)}
+.ev{width:100%;border-radius:2px;padding:1px 3px;font-size:7.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.ev-ot{background:var(--ot-c)}
+.ev-in{background:var(--acc)}
+.ev-ml{background:var(--meal-c)}
+
+/* 상세 영역 */
+.detail-wrap{flex:1;border-top:1px solid var(--border);overflow-y:auto;min-height:0}
+.detail-hdr{padding:12px 18px 6px;display:flex;align-items:center;justify-content:space-between}
+.detail-date{font-size:16px;font-weight:700;color:var(--t1)}
+.detail-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:16px;background:var(--surface);color:var(--acc)}
+.detail-list{padding:0 12px 80px}
+.dcard{background:var(--surface);border-radius:14px;padding:14px;display:flex;gap:12px;margin-bottom:6px}
+.dcard-bar{width:3px;border-radius:2px;flex-shrink:0;background:var(--acc)}
+.dcard-body{flex:1}
+.dcard-title{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:4px}
+.dcard-time{font-size:12px;color:var(--t2);margin-bottom:6px}
+.dcard-chips{display:flex;gap:4px}
+.chip{font-size:10px;font-weight:700;padding:2px 8px;border-radius:16px}
+.chip-ot{background:var(--chip-ot-bg);color:var(--ot-c)}
+.chip-meal{background:var(--chip-meal-bg);color:var(--meal-c)}
+.dcard-edit{width:28px;height:28px;border-radius:7px;background:var(--surface2);border:none;font-size:12px;cursor:pointer;flex-shrink:0}
+.mfcard{background:var(--surface);border-radius:14px;padding:14px;margin-bottom:6px}
+.mfc-title{font-size:11px;font-weight:700;color:var(--t3);margin-bottom:8px}
+.mfc-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)}
+.mfc-row:last-child{border-bottom:none}
+.mfc-lbl{font-size:12px;color:var(--t2)}
+.mfc-val{font-size:12px;font-weight:700}
+.pos{color:var(--meal-c)}
+.neg{color:var(--neg-c)}
+
+/* 하단 바 */
+.btm-bar{height:70px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 18px;flex-shrink:0;background:#fff}
+.quick-btn{height:40px;padding:0 18px;border-radius:20px;border:none;font-size:13px;font-weight:700;color:#fff;background:var(--ot-c);cursor:pointer;display:flex;align-items:center;gap:5px;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+.nav-pills{display:flex;background:var(--surface);border-radius:8px;overflow:hidden}
+.npill{padding:6px 12px;border:none;background:none;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer}
+.npill.on{background:var(--acc);color:#fff}
+
+/* ───── A안: 바텀시트 오버레이 ───── */
+.bs-overlay{position:absolute;inset:0;background:rgba(0,0,0,.4);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.bs-sheet{background:#fff;border-radius:22px 22px 0 0;padding:14px 18px 30px;width:100%;max-height:65%}
+.bs-handle{width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 12px}
+
+/* ───── B안: 주간 접기 ───── */
+.cal-row.collapsed{display:none}
+.cal-wrap-b .dcell{min-height:62px}
+
+/* ───── C안: 셀 축소 ───── */
+.cal-wrap-c .dcell{min-height:44px}
+.cal-wrap-c .dnum{font-size:11px}
+.cal-wrap-c .ev{font-size:6px;padding:0.5px 2px}
+
+/* 라벨 */
+.plan-label{position:absolute;top:60px;left:14px;right:14px;background:linear-gradient(135deg,#1a56db,#7c3aed);color:#fff;padding:8px 14px;border-radius:12px;z-index:100;font-size:13px;font-weight:700;text-align:center;box-shadow:0 4px 16px rgba(26,86,219,.3)}
+.plan-sub{font-size:10px;font-weight:400;opacity:.8;margin-top:2px}
+
+/* 비교 힌트 */
+.compare-hint{font-size:11px;color:#9ca3af;margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="mockup-title">캘린더 상세 영역 — 방안 비교</div>
+<div class="mockup-desc">날짜 클릭 후 상세 정보가 잘 안 보이는 문제를 해결하는 3가지 방안.<br/>각 탭을 눌러 비교해보세요.</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="show('current')">현재 (문제)</button>
+  <button class="tab-btn" onclick="show('a')">A안: 바텀시트</button>
+  <button class="tab-btn" onclick="show('b')">B안: 주간접기</button>
+  <button class="tab-btn" onclick="show('c')">C안: 셀축소</button>
+</div>
+
+<!-- ===== 현재 상태 (문제) ===== -->
+<div class="phone show" id="p-current">
+  <div class="plan-label">현재 상태 (문제)<div class="plan-sub">상세 영역이 거의 보이지 않음</div></div>
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="hdr-top">
+    <div class="nick-chip"><div class="nick-av">U</div><span class="nick-nm">user1</span></div>
+    <button class="logout-b">↩</button>
+  </div>
+  <div class="today-strip"><span class="today-label">오늘</span><span class="today-date">2026년 3월 10일 (화)</span></div>
+  <div class="hdr-main">
+    <div><div class="month-year">2026년</div><div class="month-big">3월</div></div>
+    <div class="tb-icons"><button class="ico-b">‹</button><button class="ico-b">›</button></div>
+  </div>
+  <div class="summary-row">
+    <div class="spill"><div class="spill-lbl">총 근무</div><div class="spill-val">10h</div></div>
+    <div class="spill ot"><div class="spill-lbl">초과</div><div class="spill-val" style="color:var(--ot-c)">0분</div></div>
+    <div class="spill ml"><div class="spill-lbl">급량 수지</div><div class="spill-val" style="color:var(--meal-c)">9,000원</div></div>
+  </div>
+  <div class="wk-hdr"><div class="wlbl">월</div><div class="wlbl">화</div><div class="wlbl">수</div><div class="wlbl">목</div><div class="wlbl">금</div><div class="wlbl sat">토</div><div class="wlbl sun">일</div></div>
+  <div class="cal-wrap" id="cal-current"></div>
+  <div class="detail-wrap">
+    <div class="detail-hdr"><div class="detail-date">3월 10일 (화)</div><div class="detail-tag">오늘</div></div>
+    <div class="detail-list">
+      <div class="dcard">
+        <div class="dcard-bar"></div>
+        <div class="dcard-body">
+          <div class="dcard-title">근무 기록</div>
+          <div class="dcard-time">08:00 → 16:17 | 8h 17m</div>
+          <div class="dcard-chips"><span class="chip chip-meal">급량 1회</span></div>
+        </div>
+        <button class="dcard-edit">✏️</button>
+      </div>
+      <div class="mfcard">
+        <div class="mfc-title">급량비 수지</div>
+        <div class="mfc-row"><span class="mfc-lbl">수령액 (1회)</span><span class="mfc-val pos">9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">식비 지출 (1회)</span><span class="mfc-val neg">-9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">순수 수지</span><span class="mfc-val">0원</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="btm-bar">
+    <button class="quick-btn" style="background:var(--ot-c)">🚪 지금 퇴근</button>
+    <div class="nav-pills"><div class="npill on">캘린더</div><div class="npill">통계</div><div class="npill">설정</div></div>
+  </div>
+</div>
+
+<!-- ===== A안: 바텀시트 오버레이 ===== -->
+<div class="phone" id="p-a">
+  <div class="plan-label" style="background:linear-gradient(135deg,#16a34a,#0d9488)">A안: 바텀시트 오버레이<div class="plan-sub">캘린더 위에 슬라이드업 — 공수 0.5~1일</div></div>
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="hdr-top">
+    <div class="nick-chip"><div class="nick-av">U</div><span class="nick-nm">user1</span></div>
+    <button class="logout-b">↩</button>
+  </div>
+  <div class="today-strip"><span class="today-label">오늘</span><span class="today-date">2026년 3월 10일 (화)</span></div>
+  <div class="hdr-main">
+    <div><div class="month-year">2026년</div><div class="month-big">3월</div></div>
+    <div class="tb-icons"><button class="ico-b">‹</button><button class="ico-b">›</button></div>
+  </div>
+  <div class="summary-row">
+    <div class="spill"><div class="spill-lbl">총 근무</div><div class="spill-val">10h</div></div>
+    <div class="spill ot"><div class="spill-lbl">초과</div><div class="spill-val" style="color:var(--ot-c)">0분</div></div>
+    <div class="spill ml"><div class="spill-lbl">급량 수지</div><div class="spill-val" style="color:var(--meal-c)">9,000원</div></div>
+  </div>
+  <div class="wk-hdr"><div class="wlbl">월</div><div class="wlbl">화</div><div class="wlbl">수</div><div class="wlbl">목</div><div class="wlbl">금</div><div class="wlbl sat">토</div><div class="wlbl sun">일</div></div>
+  <div class="cal-wrap" id="cal-a"></div>
+
+  <!-- 바텀시트 오버레이 -->
+  <div class="bs-overlay">
+    <div class="bs-sheet">
+      <div class="bs-handle"></div>
+      <div class="detail-hdr" style="padding:0 4px 8px"><div class="detail-date">3월 10일 (화)</div><div class="detail-tag">오늘</div></div>
+      <div style="overflow-y:auto;max-height:calc(100% - 60px)">
+        <div class="dcard">
+          <div class="dcard-bar"></div>
+          <div class="dcard-body">
+            <div class="dcard-title">근무 기록</div>
+            <div class="dcard-time">08:00 → 16:17 | 8h 17m</div>
+            <div class="dcard-chips"><span class="chip chip-meal">급량 1회</span></div>
+          </div>
+          <button class="dcard-edit">✏️</button>
+        </div>
+        <div class="mfcard">
+          <div class="mfc-title">급량비 수지</div>
+          <div class="mfc-row"><span class="mfc-lbl">수령액 (1회)</span><span class="mfc-val pos">9,000원</span></div>
+          <div class="mfc-row"><span class="mfc-lbl">식비 지출 (1회)</span><span class="mfc-val neg">-9,000원</span></div>
+          <div class="mfc-row"><span class="mfc-lbl">순수 수지</span><span class="mfc-val">0원</span></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--acc);background:var(--acc-soft);font-size:13px;font-weight:700;color:var(--acc);cursor:pointer">🕐 출근 완료</button>
+          <button style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--ot-c);background:var(--chip-ot-bg);font-size:13px;font-weight:700;color:var(--ot-c);cursor:pointer">🚪 퇴근</button>
+          <button style="flex:1;padding:12px;border-radius:12px;border:1.5px solid var(--meal-c);background:var(--chip-meal-bg);font-size:13px;font-weight:700;color:var(--meal-c);cursor:pointer">🍞 식사</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btm-bar" style="position:relative;z-index:0;opacity:.3">
+    <button class="quick-btn" style="background:var(--ot-c)">🚪 지금 퇴근</button>
+    <div class="nav-pills"><div class="npill on">캘린더</div><div class="npill">통계</div><div class="npill">설정</div></div>
+  </div>
+</div>
+
+<!-- ===== B안: 주간 접기 ===== -->
+<div class="phone" id="p-b">
+  <div class="plan-label" style="background:linear-gradient(135deg,#7c3aed,#e11d48)">B안: 주간 접기 (Week Collapse)<div class="plan-sub">선택된 주만 남기고 접기 — 공수 1.5~2일</div></div>
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="hdr-top">
+    <div class="nick-chip"><div class="nick-av">U</div><span class="nick-nm">user1</span></div>
+    <button class="logout-b">↩</button>
+  </div>
+  <div class="today-strip"><span class="today-label">오늘</span><span class="today-date">2026년 3월 10일 (화)</span></div>
+  <div class="hdr-main">
+    <div><div class="month-year">2026년</div><div class="month-big">3월</div></div>
+    <div class="tb-icons"><button class="ico-b">‹</button><button class="ico-b">›</button><button class="ico-b" style="font-size:10px;background:var(--acc-soft);color:var(--acc)">▼</button></div>
+  </div>
+  <div class="summary-row">
+    <div class="spill"><div class="spill-lbl">총 근무</div><div class="spill-val">10h</div></div>
+    <div class="spill ot"><div class="spill-lbl">초과</div><div class="spill-val" style="color:var(--ot-c)">0분</div></div>
+    <div class="spill ml"><div class="spill-lbl">급량 수지</div><div class="spill-val" style="color:var(--meal-c)">9,000원</div></div>
+  </div>
+  <div class="wk-hdr"><div class="wlbl">월</div><div class="wlbl">화</div><div class="wlbl">수</div><div class="wlbl">목</div><div class="wlbl">금</div><div class="wlbl sat">토</div><div class="wlbl sun">일</div></div>
+
+  <!-- 선택된 주만 1행 표시 -->
+  <div class="cal-wrap cal-wrap-b" id="cal-b"></div>
+
+  <!-- 넓어진 상세 영역 -->
+  <div class="detail-wrap" style="flex:1">
+    <div class="detail-hdr"><div class="detail-date">3월 10일 (화)</div><div class="detail-tag">오늘</div></div>
+    <div class="detail-list" style="padding-bottom:20px">
+      <div class="dcard">
+        <div class="dcard-bar"></div>
+        <div class="dcard-body">
+          <div class="dcard-title">근무 기록</div>
+          <div class="dcard-time">08:00 → 16:17 | 8h 17m</div>
+          <div class="dcard-chips"><span class="chip chip-meal">급량 1회</span></div>
+        </div>
+        <button class="dcard-edit">✏️</button>
+      </div>
+      <div class="mfcard">
+        <div class="mfc-title">급량비 수지</div>
+        <div class="mfc-row"><span class="mfc-lbl">수령액 (1회)</span><span class="mfc-val pos">9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">식비 지출 (1회)</span><span class="mfc-val neg">-9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">순수 수지</span><span class="mfc-val">0원</span></div>
+      </div>
+      <!-- 퀵 액션 (인라인) -->
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px;border-radius:14px;background:var(--surface)">
+          <span style="font-size:14px;opacity:.5">🕐</span>
+          <span style="font-size:9px;font-weight:600;color:var(--t3)">출근</span>
+          <span style="font-size:14px;font-weight:700;color:var(--t1)">08:00</span>
+        </div>
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:14px;border:1.5px solid var(--ot-c);background:var(--chip-ot-bg);cursor:pointer">
+          <span style="font-size:20px">🚪</span>
+          <span style="font-size:12px;font-weight:700;color:var(--ot-c)">퇴근</span>
+        </button>
+        <button style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px;border-radius:14px;border:1.5px solid var(--meal-c);background:var(--chip-meal-bg);cursor:pointer;position:relative">
+          <span style="font-size:20px">🍞</span>
+          <span style="font-size:12px;font-weight:700;color:var(--meal-c)">식사</span>
+          <span style="position:absolute;top:6px;right:8px;min-width:16px;height:16px;border-radius:8px;background:var(--meal-c);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span>
+        </button>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:var(--surface);border-radius:10px;font-size:11px;color:var(--t3);text-align:center">메모: 없음</div>
+    </div>
+  </div>
+  <div class="btm-bar">
+    <button class="quick-btn" style="background:var(--ot-c)">🚪 지금 퇴근</button>
+    <div class="nav-pills"><div class="npill on">캘린더</div><div class="npill">통계</div><div class="npill">설정</div></div>
+  </div>
+</div>
+
+<!-- ===== C안: 셀 높이 축소 ===== -->
+<div class="phone" id="p-c">
+  <div class="plan-label" style="background:linear-gradient(135deg,#6b7280,#9ca3af)">C안: 셀 높이 축소 (기각됨)<div class="plan-sub">min-height 62px → 44px — 공수 0.5일 미만</div></div>
+  <div class="notch"><div class="notch-pill"></div></div>
+  <div class="hdr-top">
+    <div class="nick-chip"><div class="nick-av">U</div><span class="nick-nm">user1</span></div>
+    <button class="logout-b">↩</button>
+  </div>
+  <div class="today-strip"><span class="today-label">오늘</span><span class="today-date">2026년 3월 10일 (화)</span></div>
+  <div class="hdr-main">
+    <div><div class="month-year">2026년</div><div class="month-big">3월</div></div>
+    <div class="tb-icons"><button class="ico-b">‹</button><button class="ico-b">›</button></div>
+  </div>
+  <div class="summary-row">
+    <div class="spill"><div class="spill-lbl">총 근무</div><div class="spill-val">10h</div></div>
+    <div class="spill ot"><div class="spill-lbl">초과</div><div class="spill-val" style="color:var(--ot-c)">0분</div></div>
+    <div class="spill ml"><div class="spill-lbl">급량 수지</div><div class="spill-val" style="color:var(--meal-c)">9,000원</div></div>
+  </div>
+  <div class="wk-hdr"><div class="wlbl">월</div><div class="wlbl">화</div><div class="wlbl">수</div><div class="wlbl">목</div><div class="wlbl">금</div><div class="wlbl sat">토</div><div class="wlbl sun">일</div></div>
+  <div class="cal-wrap cal-wrap-c" id="cal-c"></div>
+  <div class="detail-wrap">
+    <div class="detail-hdr"><div class="detail-date">3월 10일 (화)</div><div class="detail-tag">오늘</div></div>
+    <div class="detail-list">
+      <div class="dcard">
+        <div class="dcard-bar"></div>
+        <div class="dcard-body">
+          <div class="dcard-title">근무 기록</div>
+          <div class="dcard-time">08:00 → 16:17 | 8h 17m</div>
+          <div class="dcard-chips"><span class="chip chip-meal">급량 1회</span></div>
+        </div>
+        <button class="dcard-edit">✏️</button>
+      </div>
+      <div class="mfcard">
+        <div class="mfc-title">급량비 수지</div>
+        <div class="mfc-row"><span class="mfc-lbl">수령액 (1회)</span><span class="mfc-val pos">9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">식비 지출 (1회)</span><span class="mfc-val neg">-9,000원</span></div>
+        <div class="mfc-row"><span class="mfc-lbl">순수 수지</span><span class="mfc-val">0원</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="btm-bar">
+    <button class="quick-btn" style="background:var(--ot-c)">🚪 지금 퇴근</button>
+    <div class="nav-pills"><div class="npill on">캘린더</div><div class="npill">통계</div><div class="npill">설정</div></div>
+  </div>
+</div>
+
+<div class="compare-hint">* 실제 iPhone SE ~ iPhone 15 Pro Max 기준 390x844 프레임</div>
+
+<script>
+// 2026년 3월 캘린더 데이터
+const days2603 = [];
+// 3월 1일 = 일요일 → 월요일 시작이면 leading = 6일 (2/23~2/28)
+for(let i=5;i>=0;i--){days2603.push({d:23+i>28?23+i-28:23+i,other:true,m:23+i>28?3:2})}
+// 실제: 2/23(월)~2/28(토), 3/1(일)
+days2603.length=0;
+// 정확하게 만들자: 2026-03-01은 일요일, 월요일 시작
+// leading: 월(23), 화(24), 수(25), 목(26), 금(27), 토(28) = 6일
+const leading = [{d:23,o:true},{d:24,o:true},{d:25,o:true},{d:26,o:true},{d:27,o:true},{d:28,o:true}];
+const march = [];
+for(let i=1;i<=31;i++) march.push({d:i,o:false});
+const trailing = [{d:1,o:true},{d:2,o:true},{d:3,o:true},{d:4,o:true},{d:5,o:true}];
+const all = [...leading,...march,...trailing]; // 42일
+
+function getDow(d){
+  // 2026-03 기준, 3/1=일요일
+  // leading: 2/23=월(1), 2/24=화(2)...2/28=토(6), 3/1=일(0)
+  const idx = all.indexOf(all.find(x=>x.d===d&&!x.o));
+  if(idx<0) return -1;
+  return (idx+1)%7; // leading[0]=2/23=월 → (0+1)%7=1
+}
+
+function isToday(d,o){return d===10&&!o}
+function isSel(d,o){return d===10&&!o}
+function isSat(idx){return idx%7===5}
+function isSun(idx){return idx%7===6}
+
+// 기록 데이터 (9일과 10일)
+const recs={9:{cin:'08:00',ev:['08:00','16:17','9,000원']},10:{cin:'08:00',ev:['08:00','16:17','9,000원']}};
+
+function buildCal(targetId, rows, small){
+  const wrap = document.getElementById(targetId);
+  if(!wrap) return;
+  let html='';
+  for(let w=0;w<rows;w++){
+    html+='<div class="cal-row">';
+    for(let i=0;i<7;i++){
+      const idx=w*7+i;
+      const cell=all[idx];
+      if(!cell){html+='<div class="dcell"></div>';continue}
+      let cls='dcell';
+      if(cell.o) cls+=' other';
+      if(isToday(cell.d,cell.o)) cls+=' is-today is-sel';
+      if(isSat(idx)) cls+=' is-sat';
+      if(isSun(idx)) cls+=' is-sun';
+      // 3/1=삼일절, 3/22=일요일
+      if(!cell.o && cell.d===1) cls+=' is-sun';
+
+      let evHtml='';
+      if(!cell.o && recs[cell.d]){
+        const r=recs[cell.d];
+        evHtml=`<div class="ev ev-in">${r.ev[0]}</div><div class="ev ev-in">${r.ev[1]}</div><div class="ev ev-ml">${r.ev[2]}</div>`;
+      }
+
+      html+=`<div class="${cls}"><div class="dnum-ring"><span class="dnum">${cell.d}</span></div>${evHtml}</div>`;
+    }
+    html+='</div>';
+  }
+  wrap.innerHTML=html;
+}
+
+// B안: 선택된 주만 (10일이 포함된 주 = week index 2, 즉 9~15)
+function buildCalB(targetId){
+  const wrap = document.getElementById(targetId);
+  // 10일 = all[15] (0-indexed: leading 6 + 10-1 = 15), week = floor(15/7)=2
+  const weekIdx=2;
+  let html='<div class="cal-row">';
+  for(let i=0;i<7;i++){
+    const idx=weekIdx*7+i;
+    const cell=all[idx];
+    let cls='dcell';
+    if(cell.o) cls+=' other';
+    if(isToday(cell.d,cell.o)) cls+=' is-today is-sel';
+    if(isSat(idx)) cls+=' is-sat';
+    if(isSun(idx)) cls+=' is-sun';
+
+    let evHtml='';
+    if(!cell.o && recs[cell.d]){
+      const r=recs[cell.d];
+      evHtml=`<div class="ev ev-in">${r.ev[0]}</div><div class="ev ev-in">${r.ev[1]}</div><div class="ev ev-ml">${r.ev[2]}</div>`;
+    }
+    html+=`<div class="${cls}"><div class="dnum-ring"><span class="dnum">${cell.d}</span></div>${evHtml}</div>`;
+  }
+  html+='</div>';
+  wrap.innerHTML=html;
+}
+
+buildCal('cal-current',6,false);
+buildCal('cal-a',6,false);
+buildCalB('cal-b');
+buildCal('cal-c',6,true);
+
+function show(id){
+  document.querySelectorAll('.phone').forEach(p=>p.classList.remove('show'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('show');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

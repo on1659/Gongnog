@@ -13,3 +13,18 @@ export const records = writable({});
 export const currentView = writable('cal');
 export const selectedDate = writable(null);
 export const themePreview = writable({});
+
+// 커스텀 alert/confirm
+export const dialogState = writable(null);
+
+export function customAlert(message) {
+  return new Promise(resolve => {
+    dialogState.set({ type: 'alert', message, resolve });
+  });
+}
+
+export function customConfirm(message) {
+  return new Promise(resolve => {
+    dialogState.set({ type: 'confirm', message, resolve });
+  });
+}

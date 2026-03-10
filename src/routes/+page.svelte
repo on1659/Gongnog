@@ -1,7 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { settings, records, currentView, selectedDate } from '$lib/stores.js';
-  import { fmtW } from '$lib/constants.js';
+  import { fmtW, fmtTime } from '$lib/constants.js';
 
   // 뒤로가기 시 탭 전환 (설정/통계 → 캘린더)
   function handlePopState() {
@@ -29,6 +29,8 @@
   let modalDate = null;
   let toast = null;
   let toastTimer = null;
+  let splashVisible = true;
+  let splashFading = false;
 
   onMount(async () => {
     window.addEventListener('popstate', handlePopState);
@@ -39,6 +41,8 @@
     }
     const now = new Date();
     await loadRecords(now.getFullYear(), now.getMonth() + 1);
+    splashFading = true;
+    setTimeout(() => { splashVisible = false; }, 500);
   });
 
   onDestroy(() => {
@@ -88,9 +92,9 @@
       const { record } = await res.json();
       records.update(r => ({ ...r, [date]: record }));
       if (!checkOut) {
-        showToast(`${checkIn} 출근 기록됨`, date);
+        showToast(`${fmtTime(checkIn)} 출근 기록됨`, date);
       } else {
-        showToast(`${checkOut} 퇴근 기록됨`, date);
+        showToast(`${fmtTime(checkOut)} 퇴근 기록됨`, date);
       }
     }
   }
@@ -172,5 +176,13 @@
   <div class="toast" on:click={() => { toast = null; openModal(toast?.date); }}>
     <span class="toast-msg">{toast.msg}</span>
     <span class="toast-edit">수정</span>
+  </div>
+{/if}
+
+{#if splashVisible}
+  <div class="splash" class:fade-out={splashFading}>
+    <img class="splash-icon" src="/app-icon.svg" alt="공녹" />
+    <div class="splash-name">공녹</div>
+    <div class="splash-desc">공무원 근무기록</div>
   </div>
 {/if}

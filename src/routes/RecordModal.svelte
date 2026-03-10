@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { settings, records } from '$lib/stores.js';
+  import { settings, records, customAlert, customConfirm } from '$lib/stores.js';
   import { calcRecord, getMealPrice } from '$lib/calc.js';
   import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW } from '$lib/constants.js';
 
@@ -34,12 +34,27 @@
   $: holiday = date ? HOLIDAYS[date] : null;
   $: weekend = date ? isWeekend(date) : false;
 
-  function save() {
+  function isToday(d) {
+    const now = new Date();
+    return d === `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  }
+
+  async function save() {
+    if (isToday(date) && checkOut) {
+      const now = new Date();
+      const nowMin = now.getHours() * 60 + now.getMinutes();
+      const [h, m] = checkOut.split(':').map(Number);
+      const outMin = h * 60 + m;
+      if (outMin > nowMin) {
+        await customAlert('퇴근 시간이 현재 시간보다 미래입니다.\n확인해주세요.');
+        return;
+      }
+    }
     dispatch('save', { date, checkIn, checkOut, mealExpense: Number(mealExpense) || 0, memo });
   }
 
-  function del() {
-    if (confirm('이 날의 기록을 삭제할까요?')) {
+  async function del() {
+    if (await customConfirm('이 날의 기록을 삭제할까요?')) {
       dispatch('delete', { date });
     }
   }

@@ -1,4 +1,64 @@
 ========================================
+📋 Summit Log - 2026-03-10 (5차)
+========================================
+
+## 변경 파일
+- src/routes/RecordModal.svelte: 미래 퇴근시간 차단 + 커스텀 alert/confirm
+- src/routes/Calendar.svelte: 커스텀 confirm, 헤더 레이아웃 변경, 시간 한글 표시
+- src/routes/DaySheet.svelte: 커스텀 confirm, 시간 한글 표시
+- src/routes/+page.svelte: 스플래시 화면, 시간 한글 토스트
+- src/routes/+layout.svelte: CustomDialog 추가, 서버 테마 초기값
+- src/routes/+layout.server.js: 서버에서 테마 미리 로드 (FOUC 방지)
+- src/routes/login/+page.svelte: 로그인 성공 시 스플래시 표시
+- src/routes/CustomDialog.svelte: 신규 — 커스텀 alert/confirm 컴포넌트
+- src/lib/stores.js: dialogState, customAlert(), customConfirm() 추가
+- src/lib/constants.js: fmtMin 한글화, fmtTime() 함수 추가
+- src/app.css: 커스텀 다이얼로그, 스플래시, 헤더 레이아웃 CSS
+- static/app-icon.svg: 신규 — 앱 아이콘 (교체 가능)
+
+## 상세 변경 내역
+
+### [미래 퇴근시간 차단]
+- RecordModal.save(): 오늘 날짜에서 checkOut > 현재시각이면 customAlert로 차단
+- isToday() 헬퍼 함수 추가
+
+### [커스텀 다이얼로그]
+- stores.js: dialogState writable, customAlert/customConfirm Promise 기반
+- CustomDialog.svelte: cdlg-overlay + cdlg 팝업, alert은 확인만, confirm은 취소/확인
+- +layout.svelte에 전역 마운트
+- 교체 대상 4곳: Calendar(로그아웃), RecordModal(미래시간/삭제), DaySheet(식사 3회)
+
+### [헤더 레이아웃 변경]
+- 로그아웃: 아이콘(↩) → "로그아웃" 텍스트 (.logout-btn-text)
+- 닉네임: 좌상단 nick-chip → 우상단 header-right (.nick-name-top)
+- 오늘 날짜: today-strip (월 위 별도 행) → header-mid today-chip (월 오른쪽)
+- CSS: nick-chip/nick-avatar/nick-name/logout-btn 제거 → header-right/nick-name-top/logout-btn-text
+- CSS: today-strip 제거 → today-chip (header-mid 안)
+
+### [시간 한글 표시]
+- constants.js fmtMin: `3h 30m` → `3시간 30분`
+- constants.js fmtTime: `08:00` → `8시 00분` (신규 함수)
+- DaySheet: rec.checkIn/checkOut → fmtTime() 적용 (퀵 액션, 근무 카드)
+- Calendar: ev-in 셀 → fmtTime() 적용
+- +page.svelte: 토스트 메시지 → fmtTime() 적용
+
+### [스플래시 화면]
+- +page.svelte: splashVisible/splashFading 상태, onMount 완료 후 500ms fade-out
+- login/+page.svelte: 로그인 성공 시 showSplash=true, 800ms 후 redirect
+- static/app-icon.svg: 파일로 분리 (추후 교체 용이)
+- CSS: .splash (fixed z-9999), .splash-icon, .splash-name, .splash-desc, splashPop 애니메이션
+
+### [테마 FOUC 방지]
+- +layout.server.js: 로그인된 유저의 acc_theme/bg_theme를 DB에서 미리 조회
+- +layout.svelte: data.theme으로 settings store 초기값 설정 → 기본 테마 깜빡임 제거
+
+### [식대 팝업 위치]
+- meal-popup-overlay: align-items center → flex-start + padding-top:15vh
+- 모바일 키보드 올라와도 입력란이 화면 안에 유지
+
+========================================
+
+========================================
 📋 Summit Log - 2026-03-10 (4차)
 ========================================
 

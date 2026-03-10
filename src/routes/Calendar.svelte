@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { settings, records, selectedDate } from '$lib/stores.js';
-  import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW, pad } from '$lib/constants.js';
+  import { settings, records, selectedDate, customConfirm } from '$lib/stores.js';
+  import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW, fmtTime, pad } from '$lib/constants.js';
   import DaySheet from './DaySheet.svelte';
 
   export let user = null;
@@ -72,7 +72,7 @@
   }
 
   async function logout() {
-    if (!confirm('정말로 로그아웃 하시겠습니까?')) return;
+    if (!await customConfirm('정말로 로그아웃 하시겠습니까?')) return;
     await fetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/login';
   }
@@ -94,16 +94,11 @@
 
 <!-- 헤더 -->
 <div class="header-top">
-  <div class="nick-chip">
-    <div class="nick-avatar">{user?.username?.[0]?.toUpperCase() || '?'}</div>
-    <span class="nick-name">{user?.username || ''}</span>
+  <div></div>
+  <div class="header-right">
+    <span class="nick-name-top">{user?.username || ''}</span>
+    <button class="logout-btn-text" on:click={logout}>로그아웃</button>
   </div>
-  <button class="logout-btn" on:click={logout} title="로그아웃">↩</button>
-</div>
-
-<div class="today-strip">
-  <span class="today-label">오늘</span>
-  <span class="today-date">{new Date().getFullYear()}년 {new Date().getMonth()+1}월 {new Date().getDate()}일 ({WKKO[new Date().getDay()]})</span>
 </div>
 
 <div class="header-main">
@@ -111,9 +106,15 @@
     <div class="month-year">{yearStr}</div>
     <div class="month-big">{monthStr}</div>
   </div>
-  <div class="topbar-icons">
-    <button class="ico-btn" on:click={prevMonth} aria-label="이전 달">‹</button>
-    <button class="ico-btn" on:click={nextMonth} aria-label="다음 달">›</button>
+  <div class="header-mid">
+    <div class="today-chip">
+      <span class="today-label">오늘</span>
+      <span class="today-date">{new Date().getMonth()+1}.{new Date().getDate()} ({WKKO[new Date().getDay()]})</span>
+    </div>
+    <div class="topbar-icons">
+      <button class="ico-btn" on:click={prevMonth} aria-label="이전 달">‹</button>
+      <button class="ico-btn" on:click={nextMonth} aria-label="다음 달">›</button>
+    </div>
   </div>
 </div>
 
@@ -169,7 +170,7 @@
                 <div class="ev ev-ot">{fmtMin(rec.otMin)}</div>
               {/if}
               {#if rec.checkIn}
-                <div class="ev ev-in">{rec.checkIn}</div>
+                <div class="ev ev-in">{fmtTime(rec.checkIn)}</div>
               {/if}
               {#if rec.meals > 0}
                 {@const net = rec.meals * mp - (rec.mealExpense || 0)}
