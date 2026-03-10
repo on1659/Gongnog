@@ -1,7 +1,22 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { settings, records, currentView, selectedDate } from '$lib/stores.js';
   import { fmtW } from '$lib/constants.js';
+
+  // 뒤로가기 시 탭 전환 (설정/통계 → 캘린더)
+  function handlePopState() {
+    if ($currentView !== 'cal') {
+      currentView.set('cal');
+      history.pushState({ view: 'cal' }, '');
+    }
+  }
+
+  // 탭 변경 시 히스토리 push
+  const unsubView = currentView.subscribe(v => {
+    if (typeof window !== 'undefined' && v !== 'cal') {
+      history.pushState({ view: v }, '');
+    }
+  });
   import Calendar from './Calendar.svelte';
   import Stats from './Stats.svelte';
   import Settings from './Settings.svelte';
@@ -16,6 +31,7 @@
   let toastTimer = null;
 
   onMount(async () => {
+    window.addEventListener('popstate', handlePopState);
     const sr = await fetch('/api/settings');
     if (sr.ok) {
       const s = await sr.json();
@@ -23,6 +39,13 @@
     }
     const now = new Date();
     await loadRecords(now.getFullYear(), now.getMonth() + 1);
+  });
+
+  onDestroy(() => {
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('popstate', handlePopState);
+    }
+    unsubView();
   });
 
   async function loadRecords(year, month) {

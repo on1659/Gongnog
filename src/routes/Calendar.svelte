@@ -68,6 +68,7 @@
   }
 
   async function logout() {
+    if (!confirm('정말로 로그아웃 하시겠습니까?')) return;
     await fetch('/api/auth/logout', { method: 'POST' });
     window.location.href = '/login';
   }

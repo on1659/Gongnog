@@ -1,5 +1,6 @@
 <script>
-  import { settings } from '$lib/stores.js';
+  import { onDestroy } from 'svelte';
+  import { settings, themePreview } from '$lib/stores.js';
 
   let s = { ...$settings };
   let saved = false;
@@ -33,6 +34,18 @@
   let eveningStart = toHHMM(s.mealEveningStart);
   let eveningEnd = toHHMM(s.mealEveningEnd);
 
+  // 테마 실시간 프리뷰
+  function previewAcc(key) {
+    s.accTheme = key;
+    themePreview.set({ accTheme: s.accTheme, bgTheme: s.bgTheme });
+  }
+  function previewBg(key) {
+    s.bgTheme = key;
+    themePreview.set({ accTheme: s.accTheme, bgTheme: s.bgTheme });
+  }
+
+  onDestroy(() => { themePreview.set({}); });
+
   async function saveSettings() {
     s.mealMorningStart = toMin(morningStart);
     s.mealMorningEnd = toMin(morningEnd);
@@ -46,13 +59,14 @@
     });
     if (res.ok) {
       settings.set({ ...s });
+      themePreview.set({});
       saved = true;
       setTimeout(() => saved = false, 2000);
     }
   }
 </script>
 
-<div style="flex:1;overflow-y:auto;padding-bottom:80px">
+<div style="flex:1;overflow-y:auto;padding-bottom:140px">
   <div class="set-topbar">
     <div class="set-title">설정</div>
   </div>
@@ -62,7 +76,7 @@
     <div class="set-sec-lbl">액센트 컬러</div>
     <div class="theme-swatches">
       {#each accColors as { key, label, hex }}
-        <button class="sw-item" on:click={() => s.accTheme = key} style="background:none;border:none;cursor:pointer;padding:0">
+        <button class="sw-item" on:click={() => previewAcc(key)} style="background:none;border:none;cursor:pointer;padding:0">
           <div class="sw-circle" class:on={s.accTheme === key} style="background:{hex}"></div>
           <span class="sw-name">{label}</span>
         </button>
@@ -75,7 +89,7 @@
     <div class="set-sec-lbl">배경 테마</div>
     <div class="theme-swatches">
       {#each bgThemes as { key, label, bg, border }}
-        <button class="sw-item" on:click={() => s.bgTheme = key} style="background:none;border:none;cursor:pointer;padding:0">
+        <button class="sw-item" on:click={() => previewBg(key)} style="background:none;border:none;cursor:pointer;padding:0">
           <div class="sw-circle" class:on={s.bgTheme === key} style="background:{bg};{key==='light'?'border:3px solid #e5e7eb':''}"></div>
           <span class="sw-name">{label}</span>
         </button>

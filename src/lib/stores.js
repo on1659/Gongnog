@@ -12,3 +12,4 @@ export const settings = writable({
 export const records = writable({});
 export const currentView = writable('cal');
 export const selectedDate = writable(null);
+export const themePreview = writable({});
