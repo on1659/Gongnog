@@ -11,15 +11,15 @@
 
   let modalOpen = false;
   let modalDate = null;
+  let toast = null;
+  let toastTimer = null;
 
   onMount(async () => {
-    // settings 로드
     const sr = await fetch('/api/settings');
     if (sr.ok) {
       const s = await sr.json();
       settings.set(s);
     }
-    // 이번달 records 로드
     const now = new Date();
     await loadRecords(now.getFullYear(), now.getMonth() + 1);
   });
@@ -39,6 +39,36 @@
 
   function closeModal() {
     modalOpen = false;
+  }
+
+  function showToast(msg, date) {
+    clearTimeout(toastTimer);
+    toast = { msg, date };
+    toastTimer = setTimeout(() => { toast = null; }, 3000);
+  }
+
+  async function handleQuickClock(e) {
+    const { date, checkIn, checkOut } = e.detail;
+    const existing = $records[date];
+    const res = await fetch(`/api/records/${date}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        checkIn,
+        checkOut,
+        mealExpense: existing?.mealExpense || 0,
+        memo: existing?.memo || ''
+      })
+    });
+    if (res.ok) {
+      const { record } = await res.json();
+      records.update(r => ({ ...r, [date]: record }));
+      if (!checkOut) {
+        showToast(`${checkIn} 출근 기록됨`, date);
+      } else {
+        showToast(`${checkOut} 퇴근 기록됨`, date);
+      }
+    }
   }
 
   async function handleSave(e) {
@@ -79,7 +109,10 @@
   <Settings />
 {/if}
 
-<BottomBar on:openModal={e => openModal(e.detail.date)} />
+<BottomBar
+  on:openModal={e => openModal(e.detail.date)}
+  on:quickClock={handleQuickClock}
+/>
 
 <RecordModal
   open={modalOpen}
@@ -88,3 +121,10 @@
   on:delete={handleDelete}
   on:close={closeModal}
 />
+
+{#if toast}
+  <div class="toast" on:click={() => { toast = null; openModal(toast?.date); }}>
+    <span class="toast-msg">{toast.msg}</span>
+    <span class="toast-edit">수정</span>
+  </div>
+{/if}

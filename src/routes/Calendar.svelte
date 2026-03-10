@@ -96,6 +96,11 @@
   <button class="logout-btn" on:click={logout} title="로그아웃">↩</button>
 </div>
 
+<div class="today-strip">
+  <span class="today-label">오늘</span>
+  <span class="today-date">{new Date().getFullYear()}년 {new Date().getMonth()+1}월 {new Date().getDate()}일 ({WKKO[new Date().getDay()]})</span>
+</div>
+
 <div class="header-main">
   <div class="header-left">
     <div class="month-year">{yearStr}</div>

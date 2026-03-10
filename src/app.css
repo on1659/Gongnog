@@ -130,6 +130,11 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 /* ── 하단 바 ── */
 .btm-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 390px; background: var(--bg); border-top: 1px solid var(--border); padding: 10px 20px 28px; display: flex; align-items: center; justify-content: space-between; z-index: 10; }
 .add-btn { display: flex; align-items: center; gap: 7px; background: none; border: none; font-size: 15px; font-weight: 700; color: var(--acc); cursor: pointer; }
+.quick-btn { height: 44px; padding: 0 20px; border-radius: 22px; border: none; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform .1s; }
+.quick-btn:active { transform: scale(.95); }
+.quick-in { background: var(--acc); box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+.quick-out { background: var(--ot-c); box-shadow: 0 2px 12px rgba(0,0,0,.15); }
+.quick-icon { font-size: 16px; }
 .nav-pills { display: flex; background: var(--surface); border-radius: 10px; overflow: hidden; }
 .npill { padding: 7px 14px; border: none; background: none; font-size: 12px; font-weight: 600; color: var(--t3); cursor: pointer; }
 .npill.on { background: var(--acc); color: #fff; }
@@ -207,6 +212,17 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .sw-name { font-size: 10px; color: var(--t3); font-weight: 500; }
 .note-box { margin: 10px 14px 0; background: var(--acc-soft); border-radius: 16px; padding: 14px 16px; font-size: 12px; color: var(--acc-text); line-height: 1.9; }
 .save-btn { margin: 12px 14px; padding: 15px; border-radius: 14px; border: none; background: var(--acc); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; width: calc(100% - 28px); display: block; }
+
+/* ── 오늘 날짜 스트립 ── */
+.today-strip { padding: 6px 16px 0; display: flex; align-items: center; gap: 6px; }
+.today-label { font-size: 11px; font-weight: 700; color: #fff; background: var(--acc); padding: 2px 8px; border-radius: 6px; }
+.today-date { font-size: 12px; font-weight: 500; color: var(--t2); }
+
+/* ── 토스트 ── */
+.toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--t1); color: var(--bg); padding: 12px 20px; border-radius: 14px; font-size: 13px; font-weight: 600; z-index: 300; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,.25); animation: toastIn .25s ease; cursor: pointer; max-width: 350px; }
+.toast-msg { flex: 1; }
+.toast-edit { color: var(--acc); font-weight: 700; white-space: nowrap; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
 /* 스크롤바 스타일 */
 ::-webkit-scrollbar { width: 4px; }
