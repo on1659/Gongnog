@@ -9,19 +9,21 @@
 
   const dispatch = createEventDispatcher();
 
-  $: rec = date ? $records[date] : null;
-
   let checkIn = '08:00';
   let checkOut = '18:00';
   let mealExpense = 0;
   let memo = '';
 
-  $: if (open && date) {
-    checkIn = rec?.checkIn || '08:00';
-    checkOut = rec?.checkOut || '18:00';
-    mealExpense = rec?.mealExpense || 0;
-    memo = rec?.memo || '';
+  let initKey = '';
+  $: if (open && date && `${date}` !== initKey) {
+    initKey = date;
+    const r = $records[date];
+    checkIn = r?.checkIn || '08:00';
+    checkOut = r?.checkOut || '18:00';
+    mealExpense = r?.mealExpense || 0;
+    memo = r?.memo || '';
   }
+  $: if (!open) initKey = '';
 
   $: calc = date ? calcRecord(checkIn, checkOut, date, $settings) : { workMin: null, otMin: null, meals: 0 };
   $: mealPrice = date ? getMealPrice(date, $settings) : $settings.mealPriceWeekday;
@@ -132,7 +134,7 @@
 
     <!-- 버튼 -->
     <div class="modal-btns">
-      {#if rec?.checkIn}
+      {#if $records[date]?.checkIn}
         <button class="mbtn-del" on:click={del}>삭제</button>
       {/if}
       <button class="mbtn-cancel" on:click={close}>취소</button>
