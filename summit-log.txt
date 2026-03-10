@@ -1,0 +1,30 @@
+========================================
+📋 Summit Log - 2026-03-10
+========================================
+
+## 변경 파일
+- src/app.css: 캘린더 셀 클릭 피드백 CSS 추가
+- .gitignore: 프로젝트 초기 설정
+- 전체 소스: SvelteKit 프로젝트 초기 구현
+
+## 상세 변경 내역
+
+### [초기 배포 - 397ff96]
+- SvelteKit + adapter-node + PostgreSQL 기반 프로젝트 생성
+- 인증 시스템: bcryptjs + 커스텀 세션 (cookie + pg)
+- API: auth(login/register/logout/me), records(CRUD), settings(GET/PUT)
+- 프론트엔드: Calendar, DaySheet, RecordModal, Stats, Settings, BottomBar
+- 테마 시스템: 액센트 6종 + 배경 4종 CSS 변수 기반
+- GitHub 리포 생성 (on1659/Gongnog)
+- Railway 배포: PostgreSQL 플러그인 + 환경변수 설정
+
+### [캘린더 클릭 피드백 - 76050ad]
+- .dcell:active에 scale(.93) + acc-soft 배경 추가
+- .dcell.is-sel에 popIn 키프레임 애니메이션 추가
+- 모바일에서 터치 피드백이 없던 문제 해결
+
+### [선택 셀 배경 유지 - 23d8bc5]
+- .dcell.is-sel:not(.other-month)에 background: var(--surface) 추가
+- 클릭 후에도 어떤 날짜를 선택했는지 시각적으로 유지
+
+========================================
