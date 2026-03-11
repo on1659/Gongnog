@@ -154,6 +154,9 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .meal-popup-btns { display: flex; gap: 8px; }
 .meal-popup-cancel { flex: 1; padding: 13px; border-radius: 14px; border: none; background: var(--surface); font-size: 14px; font-weight: 600; color: var(--t2); cursor: pointer; }
 .meal-popup-confirm { flex: 1; padding: 13px; border-radius: 14px; border: none; background: var(--acc); font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; }
+.clock-adjust-btns { display: flex; gap: 6px; margin-bottom: 14px; }
+.clock-adj { flex: 1; padding: 8px 0; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); font-size: 12px; font-weight: 600; color: var(--t2); cursor: pointer; transition: background .15s; }
+.clock-adj:active { background: var(--acc-soft); }
 
 /* ── 커스텀 다이얼로그 ── */
 .cdlg-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(6px); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }

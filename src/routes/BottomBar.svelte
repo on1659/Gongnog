@@ -52,6 +52,16 @@
     showClockPopup = false;
   }
 
+  function adjustTime(min) {
+    const [h, m] = clockPopupTime.split(':').map(Number);
+    let total = h * 60 + m + min;
+    if (total < 0) total = 0;
+    if (total > 1439) total = 1439;
+    const nh = Math.floor(total / 60);
+    const nm = total % 60;
+    clockPopupTime = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+  }
+
   function openModal() {
     const date = $selectedDate || today;
     dispatch('openModal', { date });
@@ -85,6 +95,12 @@
     <div class="meal-popup-desc">{clockPopupMode === 'in' ? '출근 시간을 확인해주세요' : '퇴근 시간을 확인해주세요'}</div>
     <div class="meal-popup-input-wrap">
       <input class="meal-popup-input" type="time" bind:value={clockPopupTime} />
+    </div>
+    <div class="clock-adjust-btns">
+      <button class="clock-adj" on:click={() => adjustTime(-60)}>-60분</button>
+      <button class="clock-adj" on:click={() => adjustTime(-10)}>-10분</button>
+      <button class="clock-adj" on:click={() => adjustTime(-5)}>-5분</button>
+      <button class="clock-adj" on:click={() => adjustTime(-1)}>-1분</button>
     </div>
     <div class="meal-popup-btns">
       <button class="meal-popup-cancel" on:click={cancelClock}>취소</button>
