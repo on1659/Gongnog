@@ -1,5 +1,6 @@
 <script>
   import '../app.css';
+  import { browser } from '$app/environment';
   import { settings, themePreview } from '$lib/stores.js';
   import CustomDialog from './CustomDialog.svelte';
 
@@ -16,6 +17,9 @@
 
   $: accTheme = $themePreview.accTheme || $settings.accTheme;
   $: bgTheme = $themePreview.bgTheme || $settings.bgTheme;
+
+  // html에도 테마 클래스 적용 → CSS 변수가 body까지 cascade
+  $: if (browser) document.documentElement.className = `acc-${accTheme} bg-${bgTheme}`;
 </script>
 
 <div id="app" class="acc-{accTheme} bg-{bgTheme}">
