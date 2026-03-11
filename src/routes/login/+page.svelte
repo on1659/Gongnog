@@ -54,8 +54,8 @@
 
 {#if showSplash}
   <div class="splash">
-    <img class="splash-icon" src="/app-icon.svg" alt="공녹" />
-    <div class="splash-name">공녹</div>
+    <img class="splash-icon" src="/app-icon.svg" alt="공노기" />
+    <div class="splash-name">공노기</div>
     <div class="splash-desc">공무원 근무기록</div>
   </div>
 {/if}

@@ -92,9 +92,9 @@
       const { record } = await res.json();
       records.update(r => ({ ...r, [date]: record }));
       if (!checkOut) {
-        showToast(`${fmtTime(checkIn)} 출근 기록됨`, date);
+        showToast(`${fmtTime(checkIn)} 출근`, date);
       } else {
-        showToast(`${fmtTime(checkOut)} 퇴근 기록됨`, date);
+        showToast(`${fmtTime(checkOut)} 퇴근`, date);
       }
     }
   }
@@ -181,8 +181,8 @@
 
 {#if splashVisible}
   <div class="splash" class:fade-out={splashFading}>
-    <img class="splash-icon" src="/app-icon.svg" alt="공녹" />
-    <div class="splash-name">공녹</div>
+    <img class="splash-icon" src="/app-icon.svg" alt="공노기" />
+    <div class="splash-name">공노기</div>
     <div class="splash-desc">공무원 근무기록</div>
   </div>
 {/if}
