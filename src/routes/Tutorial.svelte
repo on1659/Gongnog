@@ -179,6 +179,7 @@
     setSeen(tutorialKey);
     destroyDOM();
     isActive = false;
+    document.querySelector('.view-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   export function prev() {

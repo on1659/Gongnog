@@ -72,8 +72,9 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .header-left {}
 .month-year { font-size: 13px; font-weight: 500; color: var(--t3); }
 .month-big { font-size: 58px; font-weight: 300; color: var(--t1); letter-spacing: -4px; line-height: 1; }
-.header-mid { display: flex; align-items: center; padding-bottom: 6px; }
-.today-date { font-size: 12px; font-weight: 500; color: var(--t2); margin-right: 4px; }
+.header-mid { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-bottom: 6px; }
+.today-row { display: flex; align-items: center; gap: 6px; }
+.today-date { font-size: 12px; font-weight: 500; color: var(--t2); }
 .topbar-icons { display: flex; gap: 6px; align-items: center; position: relative; z-index: 2; }
 .ico-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: none; color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .help-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--surface); color: var(--t2); border: 1.5px solid var(--border); cursor: pointer; font-size: .9rem; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: transform .2s; }

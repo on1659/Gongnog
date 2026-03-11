@@ -135,7 +135,7 @@
 
 <Tutorial bind:this={tutorialRef} steps={tutorialSteps} tutorialKey="stats" />
 
-<div style="flex:1;overflow-y:auto;padding-bottom:80px">
+<div class="view-scroll" style="flex:1;overflow-y:auto;padding-bottom:80px">
   <div class="stats-topbar">
     <div class="stats-title">통계</div>
   </div>

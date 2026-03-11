@@ -23,10 +23,15 @@
     }
   }
 
-  // 탭 변경 시 히스토리 push
+  // 탭 변경 시 히스토리 push + 스크롤 리셋
   const unsubView = currentView.subscribe(v => {
     if (typeof window !== 'undefined' && v !== 'cal') {
       history.pushState({ view: v }, '');
+    }
+    if (typeof window !== 'undefined') {
+      requestAnimationFrame(() => {
+        document.querySelector('.view-scroll')?.scrollTo({ top: 0 });
+      });
     }
   });
   import Calendar from './Calendar.svelte';

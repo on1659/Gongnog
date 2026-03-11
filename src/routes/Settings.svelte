@@ -121,7 +121,7 @@
 
 <Tutorial bind:this={tutorialRef} steps={tutorialSteps} tutorialKey="settings" />
 
-<div style="flex:1;overflow-y:auto;padding-bottom:140px">
+<div class="view-scroll" style="flex:1;overflow-y:auto;padding-bottom:140px">
   <div class="set-topbar">
     <div class="set-title">설정</div>
   </div>

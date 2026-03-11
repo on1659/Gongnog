@@ -116,9 +116,11 @@
     <div class="month-big">{monthStr}</div>
   </div>
   <div class="header-mid">
-    <div class="topbar-icons">
-      <span class="today-date">{new Date().getMonth()+1}.{new Date().getDate()} ({WKKO[new Date().getDay()]})</span>
+    <div class="today-row">
       <button class="help-btn" class:help-btn--pulse={helpPulse} on:click={() => dispatch('helpClick')} aria-label="도움말">?</button>
+      <span class="today-date">{new Date().getMonth()+1}.{new Date().getDate()} ({WKKO[new Date().getDay()]})</span>
+    </div>
+    <div class="topbar-icons">
       <button class="ico-btn" on:click={prevMonth} aria-label="이전 달">‹</button>
       <button class="ico-btn" on:click={nextMonth} aria-label="다음 달">›</button>
     </div>
