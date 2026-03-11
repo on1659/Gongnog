@@ -76,7 +76,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .today-chip { display: flex; align-items: center; gap: 5px; }
 .today-label { font-size: 10px; font-weight: 700; color: #fff; background: var(--acc); padding: 2px 7px; border-radius: 5px; }
 .today-date { font-size: 12px; font-weight: 500; color: var(--t2); }
-.topbar-icons { display: flex; gap: 6px; align-items: center; }
+.topbar-icons { display: flex; gap: 6px; align-items: center; position: relative; z-index: 2; }
 .ico-btn { width: 36px; height: 36px; border-radius: 10px; background: var(--surface); border: none; color: var(--t2); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .help-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--acc); color: #fff; border: 2px solid var(--acc-soft); cursor: pointer; font-size: .9rem; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px var(--acc-soft); transition: transform .2s; }
 .help-btn:hover { transform: scale(1.1); }
