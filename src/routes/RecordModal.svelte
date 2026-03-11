@@ -63,6 +63,12 @@
     dispatch('close');
   }
 
+  function scrollIntoView(e) {
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }
+
   function fmtDate(d) {
     if (!d) return '';
     return `${parseInt(d.slice(5,7))}월 ${parseInt(d.slice(-2))}일`;
@@ -121,6 +127,7 @@
     <div class="tf" style="margin-bottom:0">
       <label for="rm-expense">지출 금액</label>
       <input id="rm-expense" type="number" bind:value={mealExpense} min="0" step="100"
+        on:focus={scrollIntoView}
         style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:17px;font-weight:600;color:var(--t1);outline:none;" />
     </div>
 
@@ -144,7 +151,7 @@
     <!-- 메모 -->
     <div class="memo-field">
       <label for="rm-memo">메모 (선택)</label>
-      <input id="rm-memo" type="text" bind:value={memo} placeholder="메모를 입력하세요" />
+      <input id="rm-memo" type="text" bind:value={memo} placeholder="메모를 입력하세요" on:focus={scrollIntoView} />
     </div>
 
     <!-- 버튼 -->

@@ -1,4 +1,44 @@
 ========================================
+📋 Summit Log - 2026-03-12 (19차)
+========================================
+
+## 변경 파일
+- src/app.css: 다크 테마 CSS 변수 추가, #app에 color: var(--t1), 모달 dvh 대응
+- src/routes/Stats.svelte: Chart.js 색상을 getComputedStyle로 동적 읽기
+- src/routes/RecordModal.svelte: 입력 포커스 시 scrollIntoView 추가
+
+## 상세 변경 내역
+
+### [버그 수정] 다크 테마 텍스트 가독성
+- 문제: 다크 테마에서 기본 텍스트 색상이 브라우저 기본값(검정)으로 표시됨
+- 원인: #app에 color 속성이 없어 명시적 color가 없는 요소들이 검정색 상속
+- 수정: #app에 color: var(--t1) 추가하여 모든 자식 요소가 테마 텍스트색 상속
+
+### [버그 수정] 다크 테마 칩/배지 배경색
+- 문제: --chip-ot-bg(#fff7ed), --chip-meal-bg(#f0fdf4), --holiday-bg(#fee2e2)가 밝은 색으로 고정
+- 수정: .bg-dark, .bg-amoled에서 어두운 톤으로 재정의
+- --chip-ot-bg: dark(#2a1a08), amoled(#1f1408)
+- --chip-meal-bg: dark(#0a1f0e), amoled(#081a0b)
+- --holiday-bg: dark(#2a0a0a), amoled(#1f0808)
+
+### [버그 수정] 다크 테마 액센트 소프트 색상
+- 문제: --acc-soft가 밝은 색(#eff6ff 등)으로 다크 테마에서 눈에 띔
+- 수정: .bg-dark.acc-{color}, .bg-amoled.acc-{color} 복합 선택자로 6종 재정의
+- --acc-text도 다크 테마용 밝은 톤으로 재정의
+
+### [버그 수정] Chart.js 그래프 다크 테마 대응
+- 문제: Chart.js Canvas API는 CSS 변수(var(--acc)) 문자열을 해석 못함 → 그래프 바 색상 깨짐
+- 수정: getComputedStyle()로 실제 색상값 읽어서 Chart.js에 전달
+- 축 라벨 color: --t2, 그리드 color: --border + 33(투명도) 적용
+- $settings.accTheme/$settings.bgTheme 반응성 추가 → 테마 변경 시 차트 재빌드
+
+### [개선] 입력 모달 키보드 대응
+- 문제: 모바일에서 식비 지출/메모 입력 시 키보드에 가려져 화면 밖으로 나감
+- 수정: on:focus={scrollIntoView} 핸들러 추가 (300ms 딜레이 후 block:'center'로 스크롤)
+- .modal-sheet max-height: 90vh → 90dvh (동적 뷰포트 높이, dvh 미지원 시 90vh 폴백)
+- -webkit-overflow-scrolling: touch 추가 (iOS 관성 스크롤)
+
+========================================
 📋 Summit Log - 2026-03-11 (18차)
 ========================================
 

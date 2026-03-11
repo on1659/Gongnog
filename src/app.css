@@ -30,13 +30,21 @@ html { touch-action: pan-x pan-y; -ms-touch-action: pan-x pan-y; }
 /* ── 배경 테마 4종 ── */
 .bg-light  { --bg:#ffffff; --surface:#f2f2f7; --surface2:#e9e9ef; --border:#e5e7eb; --t1:#111827; --t2:#6b7280; --t3:#b0b7c3; }
 .bg-warm   { --bg:#fdf8f3; --surface:#f2ece3; --surface2:#e8ddd0; --border:#e0d4c3; --t1:#2c1810; --t2:#7a5c48; --t3:#b89a88; }
-.bg-dark   { --bg:#111827; --surface:#1f2937; --surface2:#374151; --border:#374151; --t1:#f9fafb; --t2:#9ca3af; --t3:#6b7280; }
-.bg-amoled { --bg:#000000; --surface:#111111; --surface2:#1f1f1f; --border:#2a2a2a; --t1:#ffffff; --t2:#a0a0a0; --t3:#555555; }
+.bg-dark   { --bg:#111827; --surface:#1f2937; --surface2:#374151; --border:#374151; --t1:#f9fafb; --t2:#9ca3af; --t3:#6b7280; --chip-ot-bg:#2a1a08; --chip-meal-bg:#0a1f0e; --holiday-bg:#2a0a0a; }
+.bg-amoled { --bg:#000000; --surface:#111111; --surface2:#1f1f1f; --border:#2a2a2a; --t1:#ffffff; --t2:#a0a0a0; --t3:#555555; --chip-ot-bg:#1f1408; --chip-meal-bg:#081a0b; --holiday-bg:#1f0808; }
+
+/* ── 다크 테마에서 액센트 소프트 색상 조정 ── */
+.bg-dark.acc-blue, .bg-amoled.acc-blue     { --acc-soft:#1a2640; --acc-text:#93b4f5; }
+.bg-dark.acc-green, .bg-amoled.acc-green   { --acc-soft:#0d2818; --acc-text:#6ee7a0; }
+.bg-dark.acc-purple, .bg-amoled.acc-purple { --acc-soft:#1f1338; --acc-text:#b89cf8; }
+.bg-dark.acc-rose, .bg-amoled.acc-rose     { --acc-soft:#2a1020; --acc-text:#f472a8; }
+.bg-dark.acc-orange, .bg-amoled.acc-orange { --acc-soft:#2a1508; --acc-text:#f8a060; }
+.bg-dark.acc-teal, .bg-amoled.acc-teal     { --acc-soft:#0a2420; --acc-text:#5eead4; }
 
 /* ── 전역 기본 ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: 'Noto Sans KR', sans-serif; background: var(--surface); display: flex; justify-content: center; min-height: 100vh; overflow: hidden; }
-#app { width: 100%; max-width: 390px; position: fixed; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); overflow: hidden; background: var(--bg); display: flex; flex-direction: column; box-shadow: 0 0 60px rgba(0,0,0,.12); }
+#app { width: 100%; max-width: 390px; position: fixed; top: 0; bottom: 0; left: 50%; transform: translateX(-50%); overflow: hidden; background: var(--bg); color: var(--t1); display: flex; flex-direction: column; box-shadow: 0 0 60px rgba(0,0,0,.12); }
 button { font-family: 'Noto Sans KR', sans-serif; }
 input { font-family: 'Noto Sans KR', sans-serif; }
 
@@ -216,7 +224,8 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 /* ── 모달 공통 ── */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); backdrop-filter: blur(8px); z-index: 200; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .25s; }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal-sheet { background: var(--bg); border-radius: 26px 26px 0 0; padding: 18px 20px 38px; width: 100%; max-width: 390px; transform: translateY(100%); transition: transform .32s cubic-bezier(.25,.46,.45,.94); max-height: 90vh; overflow-y: auto; }
+.modal-sheet { background: var(--bg); border-radius: 26px 26px 0 0; padding: 18px 20px 38px; width: 100%; max-width: 390px; transform: translateY(100%); transition: transform .32s cubic-bezier(.25,.46,.45,.94); max-height: 90dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+@supports not (max-height: 1dvh) { .modal-sheet { max-height: 90vh; } }
 .modal-overlay.open .modal-sheet { transform: none; }
 .mhandle { width: 38px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
 .modal-date { font-size: 19px; font-weight: 700; color: var(--t1); }

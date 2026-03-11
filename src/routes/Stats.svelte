@@ -53,14 +53,26 @@
 
   onDestroy(() => { chart?.destroy(); });
 
-  // records 변경 시 차트 재빌드
-  $: if (ChartLib && canvas && allRecs) {
-    buildChart(ChartLib);
+  // records 또는 테마 변경 시 차트 재빌드
+  $: if (ChartLib && canvas && allRecs && $settings.accTheme && $settings.bgTheme) {
+    // tick으로 지연하여 CSS 변수 적용 후 읽기
+    setTimeout(() => buildChart(ChartLib), 50);
+  }
+
+  function getThemeColor(varName) {
+    const el = document.getElementById('app') || document.documentElement;
+    return getComputedStyle(el).getPropertyValue(varName).trim();
   }
 
   function buildChart(Chart) {
     if (!canvas) return;
     chart?.destroy();
+
+    const accColor = getThemeColor('--acc') || '#1a56db';
+    const otColor = getThemeColor('--ot-c') || '#f97316';
+    const textColor = getThemeColor('--t2') || '#6b7280';
+    const gridColor = getThemeColor('--border') || '#e5e7eb';
+
     // 최근 7개 기록
     const recs = allRecs
       .filter(([, r]) => r.checkIn)
@@ -79,13 +91,13 @@
           {
             label: '근무(h)',
             data: workData,
-            backgroundColor: 'var(--acc)',
+            backgroundColor: accColor,
             borderRadius: 4,
           },
           {
             label: '초과(h)',
             data: otData,
-            backgroundColor: '#f97316',
+            backgroundColor: otColor,
             borderRadius: 4,
           }
         ]
@@ -94,8 +106,8 @@
         responsive: true,
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 10 } } },
-          y: { grid: { color: 'rgba(0,0,0,.05)' }, ticks: { font: { size: 10 } } }
+          x: { grid: { display: false }, ticks: { font: { size: 10 }, color: textColor } },
+          y: { grid: { color: gridColor + '33' }, ticks: { font: { size: 10 }, color: textColor } }
         }
       }
     });

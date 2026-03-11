@@ -1,4 +1,17 @@
-<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-11)</span>
+<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-12)</span>
+
+<b>🌙 다크 테마 가독성 개선</b>
+• 다크/AMOLED 테마에서 글씨가 검정색으로 보이지 않던 문제 수정
+• 통계 그래프가 다크 테마에서 보이지 않던 문제 수정
+• 다크 테마에 맞는 칩·배지 배경색 적용
+• 테마 변경 시 그래프 색상도 즉시 반영
+
+<b>📱 입력 모달 개선</b>
+• 식비 지출·메모 입력 시 키보드에 가려지지 않도록 자동 스크롤
+
+---
+
+<b style="color: #667eea;">🎮 이전 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-11)</span>
 
 <b>❓ 앱 사용 가이드 추가</b>
 • 헤더에 도움말(?) 버튼 추가
