@@ -14,6 +14,7 @@ export async function init() {
       password TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_flags INTEGER DEFAULT 0;
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,

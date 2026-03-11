@@ -1,4 +1,52 @@
 ========================================
+📋 Summit Log - 2026-03-11 (16차)
+========================================
+
+## 변경 파일
+- src/lib/server/db.js: users 테이블에 tutorial_flags 컬럼 추가 (ALTER TABLE)
+- src/lib/stores.js: tutorialFlags, FLAG_BITS, createHasSeenStore, setSeen, loadFlags 추가
+- src/routes/api/tutorial-flags/+server.js: 튜토리얼 flags GET/POST API 신규 생성
+- src/routes/Tutorial.svelte: 스포트라이트 튜토리얼 컴포넌트 신규 생성
+- src/routes/+page.svelte: Tutorial 컴포넌트 삽입, helpClick 핸들러, tutorialSteps 정의, loadFlags 호출
+- src/routes/Calendar.svelte: helpPulse prop 추가, ? 버튼 추가 (topbar-icons)
+- src/app.css: .help-btn, .help-btn--pulse, helpPulse @keyframes 추가
+- docs/gongnog-tutorial-spec.md: 튜토리얼 시스템 설계 스펙 문서
+- docs/gongnog-tutorial-impl.md: 튜토리얼 구현 가이드 문서
+
+## 상세 변경 내역
+
+### [튜토리얼 시스템]
+- Tutorial.svelte: click-blocker(z-1009) + highlight(z-1010, box-shadow spotlight) + tooltip(z-1012) 3-DOM 구조
+- 배치: 상하 전용 + flip + clamp, 화살표 --ax CSS 변수로 타겟 중심 동적 계산
+- getComputedStyle 기반 가시성 판정 (offsetParent 아님)
+- prev()는 현재 스텝 cleanup 실행, next()는 cleanup 안 함, stop()/complete()은 일괄 cleanup
+- beforeShow/cleanup 콜백 지원 (DOM 동적 주입용)
+- 함수형 title/content 지원 (typeof === 'function' 분기)
+- fallbackTarget 지원, findNext()로 안 보이는 스텝 자동 스킵
+- ESC 키 → stop(), 윈도우 리사이즈 → 위치 재계산, onDestroy → 이벤트 해제
+- CSS를 onMount에서 <style> 태그로 주입 (Svelte 스코핑 우회, @keyframes 정상 작동)
+
+### [튜토리얼 저장 추적]
+- localStorage + DB 이중 저장 (크로스 디바이스 지원)
+- users.tutorial_flags INTEGER 비트 플래그: login=1, dashboard=2
+- 비로그인 시 localStorage만으로 동작, API 실패 무시
+- createHasSeenStore: derived store로 반응형 완료 여부 (? 버튼 pulse 제어)
+- setSeen: localStorage 즉시 저장 + fetch POST /api/tutorial-flags
+- loadFlags: 로그인 유저 DB flags 로드 (onMount에서 호출)
+
+### [튜토리얼 스텝 (4단계)]
+1. 출퇴근 기록 → .quick-btn, .add-btn (position: top)
+2. 이달 요약 → .summary-row (position: bottom)
+3. 월간 캘린더 → .cal-wrap (position: top)
+4. 통계·설정 → .nav-pills (position: top)
+
+### [? 도움말 버튼]
+- Calendar.svelte topbar-icons에 .help-btn 원형 버튼 추가
+- helpPulse prop으로 미완료 시 pulse 애니메이션 적용 (!$hasSeenDashboard)
+- helpClick 이벤트 dispatch → +page.svelte에서 tutorialRef.start(true) 호출
+- CSS 변수 기반 (--acc, --acc-soft 사용, 색상 하드코딩 없음)
+
+========================================
 📋 Summit Log - 2026-03-11 (15차)
 ========================================
 

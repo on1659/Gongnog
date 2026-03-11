@@ -1,4 +1,15 @@
-<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-10)</span>
+<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-11)</span>
+
+<b>❓ 앱 사용 가이드 추가</b>
+• 헤더에 도움말(?) 버튼 추가
+• 처음 방문 시 도움말 버튼이 반짝여 사용법 안내
+• 버튼 클릭 시 주요 기능을 하나씩 소개하는 스포트라이트 튜토리얼 실행
+• 출퇴근 기록 → 이달 요약 → 캘린더 → 통계·설정 4단계로 앱 사용법 안내
+• 튜토리얼 완료 후에도 ? 버튼 클릭으로 언제든 다시 볼 수 있음
+
+---
+
+<b style="color: #667eea;">🎮 이전 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-10)</span>
 
 <b>⚡ 원터치 출퇴근</b>
 • 하단바에 "지금 출근" / "지금 퇴근" 버튼 추가
@@ -47,7 +58,7 @@
 
 ---
 
-<b style="color: #667eea;">🎮 이전 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-10)</span>
+<b style="color: #667eea;">🎮 이전 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-10 이전)</span>
 
 <b>📱 캘린더 UX 개선</b>
 • 날짜 클릭 시 누름 효과 추가 (터치/클릭 즉각 반응)

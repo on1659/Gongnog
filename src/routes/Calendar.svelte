@@ -5,6 +5,7 @@
   import DaySheet from './DaySheet.svelte';
 
   export let user = null;
+  export let helpPulse = false;
 
   const dispatch = createEventDispatcher();
 
@@ -120,6 +121,7 @@
       <span class="today-date">{new Date().getMonth()+1}.{new Date().getDate()} ({WKKO[new Date().getDay()]})</span>
     </div>
     <div class="topbar-icons">
+      <button class="help-btn" class:help-btn--pulse={helpPulse} on:click={() => dispatch('helpClick')} aria-label="도움말">?</button>
       <button class="ico-btn" on:click={prevMonth} aria-label="이전 달">‹</button>
       <button class="ico-btn" on:click={nextMonth} aria-label="다음 달">›</button>
     </div>

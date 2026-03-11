@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { settings, records, currentView, selectedDate, settingsDirty, customConfirm } from '$lib/stores.js';
+  import { settings, records, currentView, selectedDate, settingsDirty, customConfirm, createHasSeenStore, loadFlags } from '$lib/stores.js';
   import { fmtW, fmtTime } from '$lib/constants.js';
 
   // 뒤로가기 시 탭 전환 (설정/통계 → 캘린더)
@@ -33,10 +33,41 @@
   import Settings from './Settings.svelte';
   import BottomBar from './BottomBar.svelte';
   import RecordModal from './RecordModal.svelte';
+  import Tutorial from './Tutorial.svelte';
 
   export let data;
 
   let settingsRef;
+  let tutorialRef;
+  const hasSeenDashboard = createHasSeenStore('dashboard');
+
+  const tutorialSteps = [
+    {
+      target: '.quick-btn, .add-btn',
+      title: '출퇴근 기록',
+      content: '이 버튼으로 오늘 출근·퇴근 시간을 바로 기록해요. 현재 시간이 자동으로 입력됩니다.',
+      position: 'top',
+    },
+    {
+      target: '.summary-row',
+      title: '이달 요약',
+      content: '총 근무시간, 초과근무, 급량 수지를 한눈에 확인해요.',
+      position: 'bottom',
+    },
+    {
+      target: '.cal-wrap',
+      title: '월간 캘린더',
+      content: '각 날짜를 탭하면 기록을 확인하고 수정할 수 있어요. 색상 바로 근무 현황을 파악합니다.',
+      position: 'top',
+    },
+    {
+      target: '.nav-pills',
+      title: '통계 · 설정',
+      content: '통계 탭에서 차트로 분석하고, 설정 탭에서 초과근무 기준과 급량비 단가를 조정해요.',
+      position: 'top',
+    },
+  ];
+
   let modalOpen = false;
   let modalDate = null;
   let toast = null;
@@ -53,6 +84,7 @@
     }
     const now = new Date();
     await loadRecords(now.getFullYear(), now.getMonth() + 1);
+    loadFlags();
     splashFading = true;
     setTimeout(() => { splashVisible = false; }, 500);
   });
@@ -160,6 +192,8 @@
 {#if $currentView === 'cal'}
   <Calendar
     user={data.user}
+    helpPulse={!$hasSeenDashboard}
+    on:helpClick={() => tutorialRef?.start(true)}
     on:openModal={e => openModal(e.detail.date)}
     on:monthChange={handleMonthChange}
     on:quickClock={handleQuickClock}
@@ -192,6 +226,8 @@
     <span class="toast-edit">수정</span>
   </div>
 {/if}
+
+<Tutorial bind:this={tutorialRef} steps={tutorialSteps} tutorialKey="dashboard" />
 
 {#if splashVisible}
   <div class="splash" class:fade-out={splashFading}>
