@@ -35,8 +35,9 @@ html { touch-action: pan-x pan-y; -ms-touch-action: pan-x pan-y; }
 
 /* ── 전역 기본 ── */
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: 'Noto Sans KR', sans-serif; background: var(--surface); display: flex; justify-content: center; min-height: 100vh; overflow-y: auto; }
-#app { width: 100%; max-width: 390px; height: 100vh; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 60px rgba(0,0,0,.12); }
+html { height: 100%; overflow: hidden; }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--surface); display: flex; justify-content: center; height: 100%; overflow: hidden; }
+#app { width: 100%; max-width: 390px; height: 100vh; height: 100dvh; overflow: hidden; background: var(--bg); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 60px rgba(0,0,0,.12); }
 button { font-family: 'Noto Sans KR', sans-serif; }
 input { font-family: 'Noto Sans KR', sans-serif; }
 
