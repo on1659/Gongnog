@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { pool } from '$lib/server/db.js';
 
-const VALID_FLAGS = [1, 2];
+const VALID_FLAGS = [1, 2, 4, 8];
 
 export async function GET({ locals }) {
   if (!locals.user) return json({ ok: true, flags: 0 });

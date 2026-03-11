@@ -1,6 +1,35 @@
 <script>
-  import { onDestroy } from 'svelte';
-  import { settings, themePreview, settingsDirty } from '$lib/stores.js';
+  import { onMount, onDestroy } from 'svelte';
+  import { settings, themePreview, settingsDirty, createHasSeenStore } from '$lib/stores.js';
+  import Tutorial from './Tutorial.svelte';
+
+  let tutorialRef;
+  const hasSeenSettings = createHasSeenStore('settings');
+
+  const tutorialSteps = [
+    {
+      target: '#sect-theme',
+      title: '앱 테마',
+      content: '액센트 컬러와 배경 테마를 원하는 조합으로 바꿀 수 있어요. 변경 즉시 미리보기가 적용됩니다.',
+      position: 'bottom',
+    },
+    {
+      target: '#sect-ot',
+      title: '초과근무 규칙',
+      content: '자동공제 시간과 최대 초과근무 시간을 본인 근무환경에 맞게 조정해요.',
+      position: 'bottom',
+    },
+    {
+      target: '.save-btn',
+      title: '저장하기',
+      content: '설정을 변경한 뒤 반드시 저장 버튼을 눌러야 반영됩니다.',
+      position: 'top',
+    },
+  ];
+
+  onMount(() => {
+    setTimeout(() => tutorialRef?.start(), 300);
+  });
 
   let s = { ...$settings };
   let saved = false;
@@ -90,13 +119,15 @@
   }
 </script>
 
+<Tutorial bind:this={tutorialRef} steps={tutorialSteps} tutorialKey="settings" />
+
 <div style="flex:1;overflow-y:auto;padding-bottom:140px">
   <div class="set-topbar">
     <div class="set-title">설정</div>
   </div>
 
   <!-- 액센트 컬러 -->
-  <div class="set-section">
+  <div id="sect-theme" class="set-section">
     <div class="set-sec-lbl">액센트 컬러</div>
     <div class="theme-swatches">
       {#each accColors as { key, label, hex }}
@@ -122,7 +153,7 @@
   </div>
 
   <!-- 초과근무 규칙 -->
-  <div class="set-section">
+  <div id="sect-ot" class="set-section">
     <div class="set-sec-lbl">초과근무 규칙</div>
     <div class="spr">
       <span class="spr-lbl">자동 공제시간</span>

@@ -1,7 +1,32 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { records, settings } from '$lib/stores.js';
+  import { records, settings, createHasSeenStore } from '$lib/stores.js';
   import { fmtMin, fmtW, isWeekend } from '$lib/constants.js';
+  import Tutorial from './Tutorial.svelte';
+
+  let tutorialRef;
+  const hasSeenStats = createHasSeenStore('stats');
+
+  const tutorialSteps = [
+    {
+      target: '.stats-grid',
+      title: '이달 통계 요약',
+      content: '총 근무시간, 초과근무, 급량비 수령액과 순수 수지를 한눈에 볼 수 있어요.',
+      position: 'bottom',
+    },
+    {
+      target: '.chart-card',
+      title: '근무 현황 차트',
+      content: '최근 기록을 바 차트로 시각화해요. 근무 패턴을 파악하는 데 도움이 됩니다.',
+      position: 'top',
+    },
+    {
+      target: '.exp-row',
+      title: '데이터 내보내기',
+      content: '엑셀 또는 CSV 파일로 내보내 급여·근태 증빙 자료로 활용할 수 있어요.',
+      position: 'top',
+    },
+  ];
 
   let canvas;
   let chart;
@@ -23,6 +48,7 @@
     Chart.register(...registerables);
     ChartLib = Chart;
     buildChart(Chart);
+    setTimeout(() => tutorialRef?.start(), 400);
   });
 
   onDestroy(() => { chart?.destroy(); });
@@ -106,6 +132,8 @@
     URL.revokeObjectURL(url);
   }
 </script>
+
+<Tutorial bind:this={tutorialRef} steps={tutorialSteps} tutorialKey="stats" />
 
 <div style="flex:1;overflow-y:auto;padding-bottom:80px">
   <div class="stats-topbar">

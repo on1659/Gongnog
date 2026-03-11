@@ -38,6 +38,8 @@ export const flagsLoaded = writable(false);
 export const FLAG_BITS = {
   login: 1,
   dashboard: 2,
+  stats: 4,
+  settings: 8,
 };
 
 export function createHasSeenStore(tutorialKey) {
