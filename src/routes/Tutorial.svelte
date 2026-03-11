@@ -234,7 +234,9 @@
 
   onDestroy(() => {
     if (isActive) stop();
-    window.removeEventListener('keydown', handleKeydown);
-    window.removeEventListener('resize', handleResize);
+    if (browser) {
+      window.removeEventListener('keydown', handleKeydown);
+      window.removeEventListener('resize', handleResize);
+    }
   });
 </script>
