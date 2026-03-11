@@ -1,4 +1,20 @@
 ========================================
+📋 Summit Log - 2026-03-12 (20차)
+========================================
+
+## 변경 파일
+- src/routes/RecordModal.svelte: visualViewport API로 키보드 대응 강화
+
+## 상세 변경 내역
+
+### [개선] 입력 모달 키보드 대응 강화
+- 문제: 이전 scrollIntoView만으로는 iOS에서 fixed 모달 위 키보드가 입력 필드를 가림
+- 원인: iOS에서 position:fixed 요소는 키보드 열림에 반응하지 않아 가시 영역 밖으로 밀림
+- 수정: visualViewport.resize 이벤트로 키보드 올라온 실제 가시 높이 감지 → sheetEl.style.maxHeight를 vv.height-10px로 동적 조절 → scrollIntoView로 입력 중앙 배치
+- blur 시 maxHeight 원복하여 키보드 닫히면 모달 크기 복구
+- visualViewport 미지원 브라우저 폴백: 400ms 딜레이 scrollIntoView
+
+========================================
 📋 Summit Log - 2026-03-12 (19차)
 ========================================
 

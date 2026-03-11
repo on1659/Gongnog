@@ -63,10 +63,41 @@
     dispatch('close');
   }
 
-  function scrollIntoView(e) {
+  let sheetEl;
+  let focusedInput = null;
+
+  function onInputFocus(e) {
+    focusedInput = e.target;
+    // visualViewport resize 이벤트로 키보드 높이 감지
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', onViewportResize);
+    }
+    // 폴백: visualViewport 없는 경우
     setTimeout(() => {
-      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300);
+      if (focusedInput) focusedInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 400);
+  }
+
+  function onInputBlur() {
+    focusedInput = null;
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', onViewportResize);
+    }
+    // 키보드 닫히면 모달 높이 원복
+    if (sheetEl) sheetEl.style.maxHeight = '';
+  }
+
+  function onViewportResize() {
+    const vv = window.visualViewport;
+    if (!vv || !sheetEl) return;
+    // 가시 영역에 맞춰 모달 높이 제한
+    sheetEl.style.maxHeight = `${vv.height - 10}px`;
+    // 포커스된 입력으로 스크롤
+    if (focusedInput) {
+      setTimeout(() => {
+        focusedInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 50);
+    }
   }
 
   function fmtDate(d) {
@@ -84,7 +115,7 @@
   on:click|self={close}
   on:keydown={e => e.key === 'Escape' && close()}
 >
-  <div class="modal-sheet">
+  <div class="modal-sheet" bind:this={sheetEl}>
     <div class="mhandle"></div>
     <div class="modal-date">{fmtDate(date)} ({dow})</div>
     <div class="modal-badge">
@@ -127,7 +158,7 @@
     <div class="tf" style="margin-bottom:0">
       <label for="rm-expense">지출 금액</label>
       <input id="rm-expense" type="number" bind:value={mealExpense} min="0" step="100"
-        on:focus={scrollIntoView}
+        on:focus={onInputFocus} on:blur={onInputBlur}
         style="width:100%;padding:12px;border-radius:12px;border:none;background:var(--surface);font-size:17px;font-weight:600;color:var(--t1);outline:none;" />
     </div>
 
@@ -151,7 +182,7 @@
     <!-- 메모 -->
     <div class="memo-field">
       <label for="rm-memo">메모 (선택)</label>
-      <input id="rm-memo" type="text" bind:value={memo} placeholder="메모를 입력하세요" on:focus={scrollIntoView} />
+      <input id="rm-memo" type="text" bind:value={memo} placeholder="메모를 입력하세요" on:focus={onInputFocus} on:blur={onInputBlur} />
     </div>
 
     <!-- 버튼 -->
