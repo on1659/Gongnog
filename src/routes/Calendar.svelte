@@ -20,7 +20,7 @@
     const first = new Date(y, m, 1);
     const last = new Date(y, m + 1, 0);
     let startDow = first.getDay();
-    const leading = startDow === 0 ? 6 : startDow - 1;
+    const leading = startDow;
     const days = [];
     for (let i = leading - 1; i >= 0; i--) {
       const d = new Date(y, m, -i);
@@ -144,8 +144,8 @@
 
 <!-- 요일 헤더 (월~일) -->
 <div class="week-hdr">
-  {#each ['월','화','수','목','금','토','일'] as d, i}
-    <div class="wlbl" class:sat={i === 5} class:sun={i === 6}>{d}</div>
+  {#each ['일','월','화','수','목','금','토'] as d, i}
+    <div class="wlbl" class:sun={i === 0} class:sat={i === 6}>{d}</div>
   {/each}
 </div>
 
