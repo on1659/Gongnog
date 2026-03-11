@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { settings, records, customConfirm } from '$lib/stores.js';
+  import { settings, records, customConfirm, customAlert } from '$lib/stores.js';
   import { HOLIDAYS, WKKO, isWeekend, fmtMin, fmtW, fmtTime } from '$lib/constants.js';
 
   export let date = null;
@@ -23,6 +23,7 @@
   $: holiday = date ? HOLIDAYS[date] : null;
   $: weekend = date ? isWeekend(date) : false;
   $: isToday = date === todayStr();
+  $: isFuture = date ? date > todayStr() : false;
   $: mealPrice = date
     ? (isWeekend(date) ? $settings.mealPriceWeekend : $settings.mealPriceWeekday)
     : $settings.mealPriceWeekday;
@@ -73,6 +74,14 @@
     const nh = Math.floor(total / 60);
     const nm = total % 60;
     clockPopupTime = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
+  }
+
+  async function handleAdd() {
+    if (isFuture) {
+      await customAlert('미래 날짜에는 기록을 입력할 수 없습니다.');
+      return;
+    }
+    dispatch('add', { date });
   }
 
   async function openMealPopup() {
@@ -196,8 +205,8 @@
       {/if}
     {:else}
       <div class="ds-empty">
-        기록이 없습니다
-        <button class="ds-add-btn" on:click={() => dispatch('add', { date })}>＋ 기록 입력</button>
+        <div class="ds-empty-msg">기록이 없습니다</div>
+        <button class="ds-add-btn" on:click={handleAdd}>＋ 기록 입력</button>
       </div>
     {/if}
   </div>

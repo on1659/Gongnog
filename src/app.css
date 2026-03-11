@@ -124,8 +124,9 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .ds-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: var(--surface); }
 .ds-body { }
 .ds-quick { display: flex; gap: 8px; margin-bottom: 12px; }
-.ds-empty { text-align: center; color: var(--t3); font-size: 14px; padding: 20px 0; line-height: 2; }
-.ds-add-btn { margin-top:12px; padding:12px 24px; border-radius:14px; border:none; background:var(--acc); color:#fff; font-size:14px; font-weight:700; cursor:pointer; }
+.ds-empty { display:flex; flex-direction:column; align-items:center; gap:12px; color:var(--t3); font-size:14px; padding:20px 0; }
+.ds-empty-msg { color:var(--t3); }
+.ds-add-btn { padding:12px 24px; border-radius:14px; border:none; background:var(--acc); color:#fff; font-size:14px; font-weight:700; cursor:pointer; }
 
 /* ── 퀵 액션 버튼 ── */
 .qa-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 8px; border-radius: 14px; border: 1.5px solid var(--border); background: var(--bg); cursor: pointer; transition: transform .1s; position: relative; }
