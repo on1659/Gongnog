@@ -166,8 +166,8 @@
           </div>
           {#if rec && !other}
             <div class="ev-list">
-              {#if rec.checkIn}
-                <div class="ev ev-in">{rec.checkIn}</div>
+              {#if rec.otMin > 0}
+                <div class="ev ev-ot">{fmtMin(rec.otMin)}</div>
               {/if}
               {#if rec.meals > 0}
                 {@const net = rec.meals * mp - (rec.mealExpense || 0)}
