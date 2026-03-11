@@ -14,7 +14,6 @@ export async function init() {
       password TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_flags INTEGER DEFAULT 0;
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -49,5 +48,10 @@ export async function init() {
       memo TEXT DEFAULT '',
       UNIQUE(user_id, date)
     );
+  `);
+
+  // 컬럼 추가는 별도 쿼리로 실행 (multi-statement 호환성)
+  await pool.query(`
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS tutorial_flags INTEGER DEFAULT 0;
   `);
 }
