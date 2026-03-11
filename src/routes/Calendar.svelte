@@ -90,6 +90,14 @@
   }, 0);
   $: totalExpense = monthEntries.reduce((s, [, r]) => s + (r.mealExpense || 0), 0);
   $: netMeal = totalIncome - totalExpense;
+
+  function workZoneColor(workMin, dateStr) {
+    if (isWeekend(dateStr) || isHoliday(dateStr)) return 'var(--ot-c)';
+    const bufferStart = 540 - $settings.bufferMin;
+    if (workMin <= bufferStart) return 'var(--meal-c)';
+    if (workMin <= 540) return '#64748b';
+    return 'var(--ot-c)';
+  }
 </script>
 
 <!-- 헤더 -->
@@ -166,8 +174,10 @@
           </div>
           {#if rec && !other}
             <div class="ev-list">
-              {#if rec.otMin > 0}
-                <div class="ev ev-ot">{fmtMin(rec.otMin)}</div>
+              {#if isToday(date) && rec.checkIn && !rec.checkOut}
+                <div class="ev" style="background:var(--acc)">{rec.checkIn}</div>
+              {:else if rec.workMin > 0}
+                <div class="ev" style="background:{workZoneColor(rec.workMin, date)}">{fmtMin(rec.workMin)}</div>
               {/if}
               {#if rec.meals > 0}
                 {@const net = rec.meals * mp - (rec.mealExpense || 0)}
