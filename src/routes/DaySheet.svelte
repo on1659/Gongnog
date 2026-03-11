@@ -9,6 +9,9 @@
 
   let showMealPopup = false;
   let mealInputAmount = 0;
+  let showClockPopup = false;
+  let clockPopupMode = 'in';
+  let clockPopupTime = '';
 
   function todayStr() {
     const d = new Date();
@@ -32,16 +35,34 @@
     return `${parseInt(d.slice(5,7))}월 ${parseInt(d.slice(-2))}일`;
   }
 
-  function handleClockIn() {
+  function nowTime() {
     const d = new Date();
-    const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    dispatch('quickClock', { date, checkIn: t, checkOut: null });
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+
+  function handleClockIn() {
+    clockPopupMode = 'in';
+    clockPopupTime = nowTime();
+    showClockPopup = true;
   }
 
   function handleClockOut() {
-    const d = new Date();
-    const t = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    dispatch('quickClock', { date, checkIn: rec.checkIn, checkOut: t });
+    clockPopupMode = 'out';
+    clockPopupTime = nowTime();
+    showClockPopup = true;
+  }
+
+  function confirmClock() {
+    if (clockPopupMode === 'in') {
+      dispatch('quickClock', { date, checkIn: clockPopupTime, checkOut: null });
+    } else {
+      dispatch('quickClock', { date, checkIn: rec.checkIn, checkOut: clockPopupTime });
+    }
+    showClockPopup = false;
+  }
+
+  function cancelClock() {
+    showClockPopup = false;
   }
 
   async function openMealPopup() {
@@ -171,6 +192,21 @@
     {/if}
   </div>
 {/if}
+
+<!-- 출퇴근 시간 입력 팝업 -->
+<div class="meal-popup-overlay" class:open={showClockPopup} on:click|self={cancelClock}>
+  <div class="meal-popup">
+    <div class="meal-popup-title">{clockPopupMode === 'in' ? '출근 시간' : '퇴근 시간'}</div>
+    <div class="meal-popup-desc">{clockPopupMode === 'in' ? '출근 시간을 확인해주세요' : '퇴근 시간을 확인해주세요'}</div>
+    <div class="meal-popup-input-wrap">
+      <input class="meal-popup-input" type="time" bind:value={clockPopupTime} />
+    </div>
+    <div class="meal-popup-btns">
+      <button class="meal-popup-cancel" on:click={cancelClock}>취소</button>
+      <button class="meal-popup-confirm" on:click={confirmClock}>등록</button>
+    </div>
+  </div>
+</div>
 
 <!-- 식사 금액 입력 팝업 -->
 <div class="meal-popup-overlay" class:open={showMealPopup} on:click|self={cancelMeal}>

@@ -4,6 +4,10 @@
 
   const dispatch = createEventDispatcher();
 
+  let showClockPopup = false;
+  let clockPopupMode = 'in'; // 'in' or 'out'
+  let clockPopupTime = '';
+
   function todayStr() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -22,13 +26,30 @@
 
   function handleMainBtn() {
     if (btnState === 'clockIn') {
-      dispatch('quickClock', { date: today, checkIn: nowTime(), checkOut: null });
+      clockPopupMode = 'in';
+      clockPopupTime = nowTime();
+      showClockPopup = true;
     } else if (btnState === 'clockOut') {
-      dispatch('quickClock', { date: today, checkIn: todayRec.checkIn, checkOut: nowTime() });
+      clockPopupMode = 'out';
+      clockPopupTime = nowTime();
+      showClockPopup = true;
     } else {
       selectedDate.set(today);
       dispatch('openModal', { date: today });
     }
+  }
+
+  function confirmClock() {
+    if (clockPopupMode === 'in') {
+      dispatch('quickClock', { date: today, checkIn: clockPopupTime, checkOut: null });
+    } else {
+      dispatch('quickClock', { date: today, checkIn: todayRec.checkIn, checkOut: clockPopupTime });
+    }
+    showClockPopup = false;
+  }
+
+  function cancelClock() {
+    showClockPopup = false;
   }
 
   function openModal() {
@@ -55,5 +76,19 @@
     <button class="npill" class:on={$currentView === 'cal'} on:click={() => currentView.set('cal')}>캘린더</button>
     <button class="npill" class:on={$currentView === 'stats'} on:click={() => currentView.set('stats')}>통계</button>
     <button class="npill" class:on={$currentView === 'settings'} on:click={() => currentView.set('settings')}>설정</button>
+  </div>
+</div>
+
+<div class="meal-popup-overlay" class:open={showClockPopup} on:click|self={cancelClock}>
+  <div class="meal-popup">
+    <div class="meal-popup-title">{clockPopupMode === 'in' ? '출근 시간' : '퇴근 시간'}</div>
+    <div class="meal-popup-desc">{clockPopupMode === 'in' ? '출근 시간을 확인해주세요' : '퇴근 시간을 확인해주세요'}</div>
+    <div class="meal-popup-input-wrap">
+      <input class="meal-popup-input" type="time" bind:value={clockPopupTime} />
+    </div>
+    <div class="meal-popup-btns">
+      <button class="meal-popup-cancel" on:click={cancelClock}>취소</button>
+      <button class="meal-popup-confirm" on:click={confirmClock}>등록</button>
+    </div>
   </div>
 </div>
