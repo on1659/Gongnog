@@ -1,10 +1,21 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
-  import { settings, records, currentView, selectedDate } from '$lib/stores.js';
+  import { settings, records, currentView, selectedDate, settingsDirty, customConfirm } from '$lib/stores.js';
   import { fmtW, fmtTime } from '$lib/constants.js';
 
   // 뒤로가기 시 탭 전환 (설정/통계 → 캘린더)
-  function handlePopState() {
+  async function handlePopState() {
+    if ($currentView === 'settings' && $settingsDirty) {
+      history.pushState({ view: 'settings' }, '');
+      const save = await customConfirm('저장되지 않은 변경사항이 있습니다.\n저장하시겠습니까?');
+      if (save) {
+        settingsRef?.saveSettings();
+      } else {
+        settingsRef?.resetSettings();
+      }
+      currentView.set('cal');
+      return;
+    }
     if ($currentView !== 'cal') {
       currentView.set('cal');
       history.pushState({ view: 'cal' }, '');
@@ -25,6 +36,7 @@
 
   export let data;
 
+  let settingsRef;
   let modalOpen = false;
   let modalDate = null;
   let toast = null;
@@ -156,12 +168,14 @@
 {:else if $currentView === 'stats'}
   <Stats />
 {:else if $currentView === 'settings'}
-  <Settings />
+  <Settings bind:this={settingsRef} />
 {/if}
 
 <BottomBar
   on:openModal={e => openModal(e.detail.date)}
   on:quickClock={handleQuickClock}
+  on:saveSettings={() => settingsRef?.saveSettings()}
+  on:resetSettings={() => settingsRef?.resetSettings()}
 />
 
 <RecordModal

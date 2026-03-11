@@ -1,9 +1,21 @@
 <script>
   import { onDestroy } from 'svelte';
-  import { settings, themePreview } from '$lib/stores.js';
+  import { settings, themePreview, settingsDirty } from '$lib/stores.js';
 
   let s = { ...$settings };
   let saved = false;
+  let initial = JSON.stringify($settings);
+
+  $: {
+    const current = JSON.stringify({
+      ...s,
+      mealMorningStart: toMin(morningStart),
+      mealMorningEnd: toMin(morningEnd),
+      mealEveningStart: toMin(eveningStart),
+      mealEveningEnd: toMin(eveningEnd),
+    });
+    settingsDirty.set(current !== initial);
+  }
 
   const accColors = [
     { key: 'blue',   label: '블루',   hex: '#1a56db' },
@@ -44,9 +56,19 @@
     themePreview.set({ accTheme: s.accTheme, bgTheme: s.bgTheme });
   }
 
-  onDestroy(() => { themePreview.set({}); });
+  onDestroy(() => { themePreview.set({}); settingsDirty.set(false); });
 
-  async function saveSettings() {
+  export function resetSettings() {
+    s = { ...$settings };
+    morningStart = toHHMM(s.mealMorningStart);
+    morningEnd = toHHMM(s.mealMorningEnd);
+    eveningStart = toHHMM(s.mealEveningStart);
+    eveningEnd = toHHMM(s.mealEveningEnd);
+    themePreview.set({});
+    settingsDirty.set(false);
+  }
+
+  export async function saveSettings() {
     s.mealMorningStart = toMin(morningStart);
     s.mealMorningEnd = toMin(morningEnd);
     s.mealEveningStart = toMin(eveningStart);
@@ -60,6 +82,8 @@
     if (res.ok) {
       settings.set({ ...s });
       themePreview.set({});
+      initial = JSON.stringify({ ...s });
+      settingsDirty.set(false);
       saved = true;
       setTimeout(() => saved = false, 2000);
     }

@@ -1,6 +1,6 @@
 <script>
   import { createEventDispatcher } from 'svelte';
-  import { currentView, selectedDate, records } from '$lib/stores.js';
+  import { currentView, selectedDate, records, settingsDirty, customConfirm } from '$lib/stores.js';
 
   const dispatch = createEventDispatcher();
 
@@ -62,6 +62,18 @@
     clockPopupTime = `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
   }
 
+  async function switchTab(tab) {
+    if ($currentView === 'settings' && tab !== 'settings' && $settingsDirty) {
+      const save = await customConfirm('저장되지 않은 변경사항이 있습니다.\n저장하시겠습니까?');
+      if (save) {
+        dispatch('saveSettings');
+      } else {
+        dispatch('resetSettings');
+      }
+    }
+    currentView.set(tab);
+  }
+
   function openModal() {
     const date = $selectedDate || today;
     dispatch('openModal', { date });
@@ -83,9 +95,9 @@
     </button>
   {/if}
   <div class="nav-pills">
-    <button class="npill" class:on={$currentView === 'cal'} on:click={() => currentView.set('cal')}>캘린더</button>
-    <button class="npill" class:on={$currentView === 'stats'} on:click={() => currentView.set('stats')}>통계</button>
-    <button class="npill" class:on={$currentView === 'settings'} on:click={() => currentView.set('settings')}>설정</button>
+    <button class="npill" class:on={$currentView === 'cal'} on:click={() => switchTab('cal')}>캘린더</button>
+    <button class="npill" class:on={$currentView === 'stats'} on:click={() => switchTab('stats')}>통계</button>
+    <button class="npill" class:on={$currentView === 'settings'} on:click={() => switchTab('settings')}>설정</button>
   </div>
 </div>
 

@@ -13,6 +13,7 @@ export const records = writable({});
 export const currentView = writable('cal');
 export const selectedDate = writable(null);
 export const themePreview = writable({});
+export const settingsDirty = writable(false);
 
 // 커스텀 alert/confirm
 export const dialogState = writable(null);
