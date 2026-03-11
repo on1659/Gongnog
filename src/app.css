@@ -42,6 +42,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 
 /* ── 로그인 화면 ── */
 .login-hero { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.login-app-name { font-size: 13px; font-weight: 600; color: var(--t3); letter-spacing: 2px; margin-bottom: 8px; }
 .login-logo { font-size: 38px; font-weight: 800; color: var(--acc); line-height: 1.1; }
 .login-logo-sub { font-size: 38px; font-weight: 300; color: var(--t2); line-height: 1.1; }
 .login-desc { font-size: 13px; color: var(--t3); margin-top: 10px; }

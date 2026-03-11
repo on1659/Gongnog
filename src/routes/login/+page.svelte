@@ -40,6 +40,7 @@
 <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 52px; min-height:100vh;">
   <div class="login-hero">
     {#if mode === 'login'}
+      <div class="login-app-name">공노기</div>
       <div class="login-logo">근무</div>
       <div class="login-logo-sub">기록</div>
       <div class="login-desc">공무원 출퇴근 · 초과근무 · 급량비 기록</div>
