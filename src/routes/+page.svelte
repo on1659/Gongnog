@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
+  import { get } from 'svelte/store';
   import { settings, records, currentView, selectedDate, settingsDirty, customConfirm, createHasSeenStore, loadFlags } from '$lib/stores.js';
   import { fmtW, fmtTime } from '$lib/constants.js';
 
@@ -39,6 +40,7 @@
 
   let settingsRef;
   let tutorialRef;
+  let tutorialFakeKeys = [];
   const hasSeenDashboard = createHasSeenStore('dashboard');
 
   const tutorialSteps = [
@@ -59,6 +61,32 @@
       title: '월간 캘린더',
       content: '각 날짜를 탭하면 기록을 확인하고 수정할 수 있어요. 색상 바로 근무 현황을 파악합니다.',
       position: 'top',
+      beforeShow() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const fakeData = {
+          [`${y}-${m}-03`]: { checkIn: '08:00', checkOut: '18:00', workMin: 600, otMin: 0,   meals: 1, mealExpense: 9000,  memo: '' },
+          [`${y}-${m}-04`]: { checkIn: '08:30', checkOut: '19:30', workMin: 660, otMin: 60,  meals: 2, mealExpense: 14000, memo: '' },
+          [`${y}-${m}-05`]: { checkIn: '08:00', checkOut: '20:00', workMin: 720, otMin: 120, meals: 2, mealExpense: 18000, memo: '' },
+          [`${y}-${m}-06`]: { checkIn: '08:10', checkOut: '18:00', workMin: 590, otMin: 0,   meals: 1, mealExpense: 9000,  memo: '' },
+          [`${y}-${m}-09`]: { checkIn: '08:00', checkOut: '19:00', workMin: 660, otMin: 60,  meals: 2, mealExpense: 15000, memo: '' },
+          [`${y}-${m}-10`]: { checkIn: '08:00', checkOut: '18:00', workMin: 600, otMin: 0,   meals: 1, mealExpense: 9000,  memo: '' },
+        };
+        const cur = get(records);
+        tutorialFakeKeys = Object.keys(fakeData).filter(k => !cur[k]);
+        const toAdd = {};
+        tutorialFakeKeys.forEach(k => { toAdd[k] = fakeData[k]; });
+        records.update(r => ({ ...r, ...toAdd }));
+      },
+      cleanup() {
+        records.update(r => {
+          const copy = { ...r };
+          tutorialFakeKeys.forEach(k => delete copy[k]);
+          return copy;
+        });
+        tutorialFakeKeys = [];
+      },
     },
     {
       target: '.nav-pills',
