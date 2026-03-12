@@ -41,6 +41,7 @@
   <div class="login-hero">
     {#if mode === 'login'}
       <img src="/logo.png" alt="공노기" class="login-logo-img" />
+      <div class="login-desc">공무원 출퇴근 · 초과근무 · 급량비 기록</div>
     {:else}
       <div class="login-logo" style="font-size:28px;">새 계정</div>
       <div class="login-logo-sub" style="font-size:24px;">만들기</div>

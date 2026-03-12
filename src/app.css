@@ -53,7 +53,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .login-app-name { font-size: 13px; font-weight: 600; color: var(--t3); letter-spacing: 2px; margin-bottom: 8px; }
 .login-logo { font-size: 38px; font-weight: 800; color: var(--acc); line-height: 1.1; }
 .login-logo-sub { font-size: 38px; font-weight: 300; color: var(--t2); line-height: 1.1; }
-.login-logo-img { width: 80px; height: auto; margin-bottom: 12px; }
+.login-logo-img { width: 110px; height: auto; margin-bottom: 12px; }
 .login-desc { font-size: 13px; color: var(--t3); margin-top: 10px; }
 .login-divider { height: 1px; background: var(--border); margin: 32px 0; }
 .lf-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: block; }
