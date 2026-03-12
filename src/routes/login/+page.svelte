@@ -37,7 +37,7 @@
   }
 </script>
 
-<div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 52px; min-height:100%; overflow-y:auto;">
+<div class="login-wrap" class:register={mode === 'register'}>
   <div class="login-hero">
     {#if mode === 'login'}
       <div class="login-app-name">공노기</div>
@@ -45,8 +45,8 @@
       <div class="login-logo-sub">기록</div>
       <div class="login-desc">공무원 출퇴근 · 초과근무 · 급량비 기록</div>
     {:else}
-      <div class="login-logo" style="font-size:32px;">새 계정</div>
-      <div class="login-logo-sub" style="font-size:28px;">만들기</div>
+      <div class="login-logo" style="font-size:28px;">새 계정</div>
+      <div class="login-logo-sub" style="font-size:24px;">만들기</div>
       <div class="login-desc">아이디와 비밀번호를 입력해주세요</div>
     {/if}
   </div>
@@ -68,6 +68,15 @@
     <button style="background:none;border:none;color:var(--acc);font-weight:600;font-size:13px;cursor:pointer;padding:0" on:click={toggleMode}>{mode === 'login' ? '회원가입' : '로그인'}</button>
   </div>
 </div>
+
+<style>
+  .login-wrap { flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 52px; min-height:100%; }
+  .login-wrap.register :global(.login-divider) { margin: 16px 0; }
+  .login-wrap.register :global(.lf-input) { margin-bottom: 12px; }
+  .login-wrap.register :global(.login-btn) { margin-top: 4px; }
+  .login-wrap.register :global(.login-sub) { margin-top: 10px; }
+  .login-wrap.register :global(.login-error) { margin-top: 4px; min-height: 16px; }
+</style>
 
 {#if showSplash}
   <div class="splash">
