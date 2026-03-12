@@ -1,4 +1,19 @@
 ========================================
+📋 Summit Log - 2026-03-12 (21차)
+========================================
+
+## 변경 파일
+- src/app.css: 식사 금액 팝업 input overflow 수정
+
+## 상세 변경 내역
+
+### [버그 수정] 퀵 식사 금액 입력 팝업 overflow
+- 문제: .meal-popup-input(type=number)이 팝업(width:300px) 밖으로 넘침
+- 원인: flex 자식의 기본 min-width:auto가 content 크기만큼 강제 확장
+- 수정: .meal-popup-input에 min-width:0 추가, wrap에 overflow:hidden 추가
+- number input 스피너(화살표) 숨김: -moz-appearance:textfield + ::-webkit-spin-button 제거
+
+========================================
 📋 Summit Log - 2026-03-12 (20차)
 ========================================
 
