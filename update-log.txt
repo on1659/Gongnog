@@ -1,4 +1,12 @@
-<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-12)</span>
+<b style="color: #667eea;">🎮 최신 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-13)</span>
+
+<b>🎨 로고 적용</b>
+• 새 로고를 로그인 화면, 스플래시 화면, 브라우저 탭 아이콘에 적용
+• 기존 임시 아이콘(파란 G)을 새 공노기 로고로 교체
+
+---
+
+<b style="color: #667eea;">🎮 이전 업데이트</b> <span style="color: #999; font-size: 12px; font-weight: normal;">(2026-03-12)</span>
 
 <b>🌙 다크 테마 가독성 개선</b>
 • 다크/AMOLED 테마에서 글씨가 검정색으로 보이지 않던 문제 수정

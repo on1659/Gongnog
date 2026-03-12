@@ -264,7 +264,7 @@
 
 {#if splashVisible}
   <div class="splash" class:fade-out={splashFading}>
-    <img class="splash-icon" src="/app-icon.svg" alt="공노기" />
+    <img class="splash-icon" src="/logo.png" alt="공노기" />
     <div class="splash-name">공노기</div>
     <div class="splash-desc">공무원 근무기록</div>
   </div>

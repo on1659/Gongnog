@@ -53,6 +53,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 .login-app-name { font-size: 13px; font-weight: 600; color: var(--t3); letter-spacing: 2px; margin-bottom: 8px; }
 .login-logo { font-size: 38px; font-weight: 800; color: var(--acc); line-height: 1.1; }
 .login-logo-sub { font-size: 38px; font-weight: 300; color: var(--t2); line-height: 1.1; }
+.login-logo-img { width: 80px; height: auto; margin-bottom: 12px; }
 .login-desc { font-size: 13px; color: var(--t3); margin-top: 10px; }
 .login-divider { height: 1px; background: var(--border); margin: 32px 0; }
 .lf-label { font-size: 11px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; display: block; }
@@ -65,7 +66,7 @@ input { font-family: 'Noto Sans KR', sans-serif; }
 /* ── 스플래시 ── */
 .splash { position: fixed; inset: 0; z-index: 9999; background: var(--bg, #fff); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; opacity: 1; transition: opacity .4s ease; }
 .splash.fade-out { opacity: 0; pointer-events: none; }
-.splash-icon { width: 72px; height: 72px; border-radius: 18px; animation: splashPop .5s ease both; }
+.splash-icon { width: 72px; height: auto; border-radius: 0; animation: splashPop .5s ease both; }
 .splash-name { font-size: 26px; font-weight: 800; color: var(--t1, #222); letter-spacing: -1px; animation: splashPop .5s .1s ease both; }
 .splash-desc { font-size: 13px; font-weight: 500; color: var(--t3, #999); animation: splashPop .5s .2s ease both; }
 @keyframes splashPop { from { opacity: 0; transform: scale(.8) translateY(10px); } to { opacity: 1; transform: none; } }

@@ -1,4 +1,26 @@
 ========================================
+📋 Summit Log - 2026-03-13 (22차)
+========================================
+
+## 변경 파일
+- resource/logo.png: 새 로고 원본 (이소메트릭 블록 + ㄱㄴㄱ GONGNOGI)
+- static/logo.png: 웹 접근용 로고 복사본
+- src/app.html: favicon + apple-touch-icon 추가
+- src/app.css: .login-logo-img 클래스 추가, .splash-icon height:auto/border-radius:0
+- src/routes/login/+page.svelte: 로그인 히어로에 로고 이미지 추가, 스플래시 아이콘 교체
+- src/routes/+page.svelte: 메인 스플래시 아이콘 교체
+
+## 상세 변경 내역
+
+### [기능] 로고 적용
+- resource/logo.png를 static/logo.png로 복사하여 /logo.png 경로로 웹 접근 가능
+- app.html: <link rel="icon"> + <link rel="apple-touch-icon"> 추가 → 브라우저 탭/홈화면 아이콘
+- login/+page.svelte: 로그인 모드 히어로 영역 상단에 <img class="login-logo-img"> 추가
+- login/+page.svelte + +page.svelte: 스플래시 화면 src를 /app-icon.svg → /logo.png로 변경
+- app.css: .login-logo-img { width:80px; height:auto; margin-bottom:12px } 추가
+- app.css: .splash-icon height:72px→auto, border-radius:18px→0 (투명 배경 PNG 대응)
+
+========================================
 📋 Summit Log - 2026-03-12 (21차)
 ========================================
 

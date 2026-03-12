@@ -40,6 +40,7 @@
 <div class="login-wrap" class:register={mode === 'register'}>
   <div class="login-hero">
     {#if mode === 'login'}
+      <img src="/logo.png" alt="공노기" class="login-logo-img" />
       <div class="login-app-name">공노기</div>
       <div class="login-logo">근무</div>
       <div class="login-logo-sub">기록</div>
@@ -80,7 +81,7 @@
 
 {#if showSplash}
   <div class="splash">
-    <img class="splash-icon" src="/app-icon.svg" alt="공노기" />
+    <img class="splash-icon" src="/logo.png" alt="공노기" />
     <div class="splash-name">공노기</div>
     <div class="splash-desc">공무원 근무기록</div>
   </div>
