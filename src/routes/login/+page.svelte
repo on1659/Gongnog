@@ -37,7 +37,7 @@
   }
 </script>
 
-<div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 52px; min-height:100vh;">
+<div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; padding:0 28px 52px; min-height:100%; overflow-y:auto;">
   <div class="login-hero">
     {#if mode === 'login'}
       <div class="login-app-name">공노기</div>
